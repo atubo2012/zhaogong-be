@@ -1,5 +1,6 @@
 {
   "name": "zhaogong",
+
   "script": "app.js",
   "cwd": "./",
   "exec_mode": "fork",
