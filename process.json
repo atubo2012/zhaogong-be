@@ -7,6 +7,7 @@
   "watch": true,
   "env": {
     "NODE_ENV": "production",
+
     "DEBUG_SDK": "yes"
   }
 }
