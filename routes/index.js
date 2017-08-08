@@ -1,6 +1,6 @@
-let express = require('express');
-let router = express.Router();
-let bizUser = require('../biz/bizUser.js');
+var express = require('express');
+var router = express.Router();
+var bizUser = require('../biz/bizUser.js');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
