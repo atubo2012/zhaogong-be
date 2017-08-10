@@ -5,6 +5,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+
+//测试git中文
+//测试git中文2
+
 var index = require('./routes/index');
 var users = require('./routes/users');
 
