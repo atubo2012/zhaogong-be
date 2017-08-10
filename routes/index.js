@@ -6,6 +6,9 @@ var bizUser = require('../biz/bizUser.js');
 router.get('/', function(req, res, next) {
     res.render('index', { title: 'Express你好' });
 });
+router.get('/users', function(req, res, next) {
+    res.send('/users access ok');
+});
 
 router.post('/user/insert'  , bizUser.insert);
 router.get('/user/findall'  , bizUser.findAll);
