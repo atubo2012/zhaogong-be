@@ -15,6 +15,9 @@ pids
 #the third modules
 node_moudules/
 
+#the upload
+upload/
+
 #npm cache
 .npm
 
