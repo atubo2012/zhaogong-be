@@ -1,4 +1,6 @@
-function fmd(date, style) {
+'use strict';
+
+let fmd = function(date, style) {
     let y = date.getFullYear();
     let M = "0" + (date.getMonth() + 1);
     M = M.substring(M.length - 2);
@@ -36,7 +38,7 @@ exports.debug = function () {
     log(logLevel.DEBUG,'debug',arguments);
 };
 
-function log (level,levelDesc,args) {
+let log = function(level,levelDesc,args) {
     if (logLevel.LEVEL <= level) {
         let now = fmd(new Date(), 'hhmmss');
 
@@ -62,7 +64,7 @@ exports.getId = function (idPrefix) {
     return getId(idPrefix)
 };
 
-getId = function (idPrefix) {
+let getId = function (idPrefix) {
     let ts = (new Date().getTime()).toFixed(0);
     return idPrefix + ts;
 };
@@ -77,7 +79,7 @@ getId = function (idPrefix) {
 exports.reqLog = function (req, res, err) {
     return reqLog(req, res, err)
 };
-reqLog = function (req, res, err) {
+let reqLog = function (req, res, err) {
     console.log(getCc('S'));
     console.log('req.url:');
     console.log(req.url);
@@ -94,7 +96,7 @@ reqLog = function (req, res, err) {
  * @param str
  * @returns {string}
  */
-getRf = function (str) {
+let getRf = function (str) {
     let ret = str;
     let ROWLENGTH = 100;
     if (str.length < ROWLENGTH) {
@@ -110,7 +112,7 @@ getRf = function (str) {
  * @param str
  * @returns {string}
  */
-getLf = function (str) {
+let getLf = function (str) {
     let ret = str;
     let ROWLENGTH = 100;
     if (str.length < ROWLENGTH) {
@@ -127,7 +129,7 @@ getLf = function (str) {
  * @param str 字符内容
  * @returns {*}
  */
-getCc = function (str) {
+let getCc = function (str) {
     let ret = '';
     let ROWLENGTH = 100;
     for (let i = 0; i < ROWLENGTH; i++) {
@@ -140,7 +142,7 @@ getCc = function (str) {
  * 将对象格式化成字符
  * @param obj
  */
-prtObj = function (obj) {
+let prtObj = function (obj) {
 
     let str = getCc('S') + '\n';
     if (typeof(obj) === 'object') {
