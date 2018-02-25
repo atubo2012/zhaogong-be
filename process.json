@@ -6,7 +6,6 @@
   "watch"		: true,
   "ignore_watch": ["public","public/upload","public",".idea",".git"],
   "node_args"	: "--use-strict",
-
   "env": {
     "NODE_ENV"	: "production",
     "DEBUG_SDK"	: "yes"

@@ -2,6 +2,7 @@
 
 let cf = require('../beconfig.js');
 let ut = require('../utils/utils.js');
+let log = ut.logger(__filename);
 
 module.exports.edit = function (req, res, err) {
 
@@ -14,16 +15,18 @@ module.exports.edit = function (req, res, err) {
      * D：p中仅包括reqID和rdst=0，直接将p作为更新字段列表执行updateOne
      */
 
-    console.log('请求参数:'+JSON.stringify(p));
+    console.log('请求参数1：'+JSON.stringify(p));
 
+    log.debug('请求参数2：',p);
 
     //如果请求中没有reqId，则说明是新增请求，则生成reqId
     if (p.reqId === '') {
         //p['reqId'] = (new Date().getTime()).toFixed(0);
         p['reqId'] = ut.getId('REQ');
-        console.log('生成reqId=' + p['reqId']);
+        p['c2CLNT'] = {};
+        p['c2LBOR'] = {};
+        log.debug('生成reqId后',p);
     }
-
     try {
         let MongoClient = require('mongodb').MongoClient;
 
@@ -43,7 +46,8 @@ module.exports.edit = function (req, res, err) {
                     w: 1
                 }, function (err, r) {
                     t.equal(null, err);
-                    console.log(JSON.stringify(r));
+                    log.debug(JSON.stringify(r));
+
                     db.close();
                     res.send('ok');
                 });
@@ -51,27 +55,36 @@ module.exports.edit = function (req, res, err) {
 
 
     } catch (err) {
-        console.log(err);
+        log.error(err);
     }
 
 };
 
-
+/**
+ * 需求单查询列表。分为4类：
+ * 1、lbor查看所有需求单list（TODO:查看自己附近的需求单）， 前端设置查询条件：{翻页参数}
+ * 2、lbor看自己的需求单list（功能入口在我的模块中），前端设置查询条件：{'lborInfo.openId':openId}
+ * 3、clnt看自己的需求单list（功能入口在我的模块中），前端设置查询条件：{'clntInfo.openId':openId}
+ * 4、clnt查看某条需求单，edit备用（功能入口是点击我的需求单时进入），前设置查询条件：{'reqId':reqId}
+ */
 module.exports.list = function (req, res, err) {
 
     let p = req.query;
 
-    console.log(req.query);
+    log.debug('需求单list，前端传入的参数：',p);
 
     try {
 
         //查询条件，默认是全量查询
         let cond = {};
 
-        //如果请求中有userInfo，则按照userInfo查询
+        //如果请求中有reqId，则按照reqId查询单条
         if (typeof(p.reqId) !== 'undefined') {
             console.log('按照reqId查询：' + p.reqId);
             cond['reqId'] = p.reqId;
+        }else
+        {
+            cond = p;
         }
 
         //如果请求中有userInfo，则按照userInfo查询
@@ -81,21 +94,20 @@ module.exports.list = function (req, res, err) {
         //     cond['userInfo.nickName'] = p.nickName;
         //
         // }
-
-        console.log('查询条件cond:' + JSON.stringify(cond));
+        log.debug('查询条件cond:' + JSON.stringify(cond));
         let MongoClient = require('mongodb').MongoClient;
         MongoClient.connect(cf.dbUrl, function (err, db) {
 
             let coll = db.collection('rqst');
 
-            coll.find(cond).toArray(function (err, docs) {
+            coll.find( Object.assign(cond )).sort({'updt':-1}).toArray(function (err, docs) {
                 res.send(JSON.stringify(docs)); //将后端将数据以JSON字符串方式返回，前端以query.data获取数据。
                 db.close();
             });
         });
 
     } catch (err) {
-        console.log(err);
+        log.error(err);
     }
 
 };
