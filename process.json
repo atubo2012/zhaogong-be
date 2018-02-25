@@ -9,6 +9,7 @@
 
   "env": {
     "NODE_ENV": "production",
-    "DEBUG_SDK": "yes"
+    "DEBUG_SDK": "yes",
+    "AB":"CD"
   }
 }
