@@ -1,15 +1,20 @@
 'use strict';
+
+/**
+ * TODO：在后端程序中，将以下三个变量补全，并规范日志。
+ */
 let cf = require('../beconfig.js');
 let ut = require('../utils/utils.js');
+let log = ut.logger(__filename);
 
 module.exports.edit = function (req, res, err) {
 
     //前后台之间用rdata作为参数名，rdata意为remote data，即远程数据。
     let p = JSON.parse(req.query.rdata);
 
-
+    ut.reqLog(req, res, err);
     try {
-        ut.debug(p);
+
 
         let MongoClient = require('mongodb').MongoClient;
 
@@ -17,7 +22,7 @@ module.exports.edit = function (req, res, err) {
             let coll = db.collection('lbor');
             let t = require('assert');
 
-            coll.updateOne({'userInfo.nickName': p.userInfo.nickName}, p, {upsert: true, w: 1}, function (err, r) {
+            coll.updateOne({'userInfo.openId': p.userInfo.openId}, p, {upsert: true, w: 1}, function (err, r) {
                 t.equal(null, err);
                 t.equal(1, r.result.n);
                 db.close();
@@ -28,7 +33,7 @@ module.exports.edit = function (req, res, err) {
 
     } catch (err) {
         res.send('error:'+err.message);
-        console.log('================' + err.message);
+        log.error('edit',err);
     }
 };
 
@@ -37,8 +42,6 @@ module.exports.detl = function (req, res, err) {
     let p = JSON.parse(req.query.userInfo);
     console.log(JSON.stringify(p));
 
-    let resMsg = '应答信息：';
-
     try {
         let MongoClient = require('mongodb').MongoClient;
 
@@ -46,7 +49,7 @@ module.exports.detl = function (req, res, err) {
 
             let coll = db.collection('lbor');
 
-            coll.find({"userInfo.nickName": p.nickName}).toArray(function (err, docs) {
+            coll.find({"userInfo.openId": p.openId}).toArray(function (err, docs) {
 
                 if(docs.length>0)
                 {
@@ -56,15 +59,15 @@ module.exports.detl = function (req, res, err) {
                 else{
                     res.send('0');
                 }
-
                 db.close();
             });
         });
     } catch (err) {
-        console.log('================' + err.message);
+        log.error('detl' + err);
     }
 };
 
+//todo:查看服务人员清单
 module.exports.list = function (req, res, err) {
 
 };
