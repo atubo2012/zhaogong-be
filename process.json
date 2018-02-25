@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name"		: "zhaogong",
   "script"		: "bin/www",
   "cwd"			: "/root/workspace/zhaogong-be",
@@ -6,7 +7,16 @@
   "watch"		: true,
   "ignore_watch": ["public","public/upload","public",".idea",".git"],
   "node_args"	: "--use-strict",
-  
+=======
+  "name": "zhaogong",
+  "script": "./bin/www",
+  "cwd": "./",
+  "exec_mode": "fork",
+
+  "watch": true,
+  "ignore_watch" : ["node_modules", "public",".idea",".git"],
+>>>>>>> 567b913804b8a16749434f872c3f8c078f9b3cf6
+
   "env": {
     "NODE_ENV"	: "production",
     "DEBUG_SDK"	: "yes"
