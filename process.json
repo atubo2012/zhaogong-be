@@ -3,7 +3,10 @@
   "script": "./bin/www",
   "cwd": "./",
   "exec_mode": "fork",
+
   "watch": true,
+  "ignore_watch" : ["node_modules", "public",".idea",".git"],
+
   "env": {
     "NODE_ENV": "production",
     "DEBUG_SDK": "yes"
