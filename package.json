@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "pm2 start process.json"
+    "start": "pm2 start process.json",
+    "test": "ls "
   },
 
   "//":[
