@@ -6,7 +6,6 @@ module.exports = {
 
     //数据库参数
     dbUrl:'mongodb://100td:27117/test',
-    //dbUrl:'mongodb://localhost:27117/test',
 
     //找工小程序的保密信息
     appId:'wx887e4e9e1c47b47d',                 //小程序的appid
@@ -33,11 +32,11 @@ module.exports = {
     logConfig:{
         appenders: {
             out:{type: 'stdout'},
-            app:{type:'file', filename:'c://log4jsc.log', maxLogSize:2048000, backups:3,compress:true},
+            app:{type:'file', filename:'/root/.pm2/logs/zg.log', maxLogSize:2048000, backups:3,compress:true},
         },
         categories:{
             default:{appenders:['out','app'],level:'debug'},
-            utils:{appenders:['out','app'],level:'trace'}
+            utils:{appenders:['out','app'],level:'debug'}
         }
     }
 
