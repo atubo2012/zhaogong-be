@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "pm2 start process.json",
+    "changelog": "changelog": "conventional-changelog -p angular -i CHANGELOG.md -w -r 0",
     "test": "ls "
   },
 
