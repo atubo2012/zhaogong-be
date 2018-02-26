@@ -6,4 +6,5 @@ node_js:
 before_install:
   - "npm run changelog"
 
-install: true
+install: 
+  - "npm install"
