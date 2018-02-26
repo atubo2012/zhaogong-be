@@ -4,7 +4,9 @@ node_js:
   - "6"
 
 before_install:
+  - "npm update"
+  - "npm install -g conventional-changelog-cli"
+  - "npm install -g conventional-changelog"
   - "npm run changelog"
 
-install: 
-  - "npm install"
+install: true
