@@ -9,7 +9,6 @@
   },
 
   "//":[
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -w -r 0 <--生成初始的changelog",
     "http://javascript.ruanyifeng.com/nodejs/packagejson.html <--只是用来做JSON的注释",
     "http://blog.csdn.net/u011240877/article/details/76582670"
   ],
