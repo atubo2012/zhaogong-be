@@ -18,7 +18,7 @@ let cf = require('../beconfig.js');
 /**
  * 获得环境变量信息，可以从process.env.NODE_ENV中获取process.json配置的NODE_ENV等类似的环境变量
  */
-console.log('aaaaa',process.env);
+//console.log('aaaaa',process.env);
 
 
 /**
