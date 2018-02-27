@@ -1,6 +1,6 @@
 require('./globals');
 require('./setup-qcloud-sdk');
-require('./utils/test');    //便于实验室test.js的程序能在nodejs不手动重启的情况下验证。
+//require('./utils/test');    //便于实验室test.js的程序能在nodejs不手动重启的情况下验证。
 
 let ut = require('./utils/utils.js');
 let log = ut.logger(__filename);
@@ -24,7 +24,9 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+
+//http请求日志，为了避免服务器上负载均衡服务器发来的探测日志太多，200以内的都不输出，节省空间
+app.use(logger('combined', {skip: function (req, res) { return res.statusCode <= 200 }}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
@@ -36,22 +38,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(function (req, res, next) {
     try {
 
-        ut.reqLog(req, res, next);
+        //ut.reqLog(req, res, next);
+//		log.debug('0000000000000000000000000000000000',req._remoteAddress);
 
         //如果是登录请求，则继续执行后续逻辑
         if (req.originalUrl.indexOf('/login2') === 0) {
-            log.debug('SESSION:收到登录请求，不进行session校验。');
+            log.trace('SESSION:收到登录请求，不进行session校验。');
             next();
         }
         //如果不是登录请求，则校验会话，若会话过期，则直接应答
         else if (!ut.checkSession(req.get('session3rdKey'))) {
-            log.debug('SESSION:非登录请求，会话已超时，应答中将head.RTCD设置为超时。');
+            log.trace('SESSION:非登录请求，会话已超时，应答中将head.RTCD设置为超时。');
             res.set('RTCD', 'RTCD_SESSION_TIMEOUT');
             res.send('');
         }
         //如果会话未过期，则继续执行后续逻辑
         else {
-            log.info('SESSION:会话未过期，放行。');
+            log.trace('SESSION:会话未过期，放行。');
             next();
         }
 

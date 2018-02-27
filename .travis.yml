@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - "node"
+  - "6"
+
+before_install:
+  - "npm update"
+  - "npm install -g conventional-changelog-cli"
+  - "npm install -g conventional-changelog"
+  - "npm run changelog"
+
+install: true

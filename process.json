@@ -1,15 +1,13 @@
 {
-  "name": "zhaogong",
-  "script": "./bin/www",
-  "cwd": "./",
-  "exec_mode": "fork",
-
-  "watch": true,
-  "ignore_watch" : ["node_modules", "public",".idea",".git"],
-
+  "name"		: "zhaogong",
+  "script"		: "bin/www",
+  "cwd"			: "/root/workspace/zhaogong-be",
+  "exec_mode"	: "fork",
+  "watch"		: true,
+  "ignore_watch": ["public","public/upload","public",".idea",".git"],
+  "node_args"	: "--use-strict",
   "env": {
-    "NODE_ENV": "production",
-    "DEBUG_SDK": "yes",
-    "AB":"CDE"
+    "NODE_ENV"	: "production",
+    "DEBUG_SDK"	: "yes"
   }
 }
