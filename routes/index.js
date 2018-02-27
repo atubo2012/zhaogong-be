@@ -25,7 +25,6 @@ router.get('/user/remove/:Id', bizUser.remove);
 router.get('/login', require('./login'));
 
 router.get('/user', require('./user'));
-router.get('/r_cleaning', require('./r_cleaning'));
 router.all('/tunnel', require('./tunnel'));
 
 
