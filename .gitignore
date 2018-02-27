@@ -28,3 +28,11 @@ upload/
 .idea/
 
 .git/
+
+#开发环境使用的脚本
+go.bat
+gomg.bat
+by.bat
+log.bat
+mgclr.bat
+
