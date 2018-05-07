@@ -32,15 +32,11 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//console.log('ccccc',process.env);
+//log.debug('初始环境变量',process.env);
 
 //session校验中间件，避免后端程序中每行都要增加此项内容
 app.use(function (req, res, next) {
     try {
-
-        //ut.reqLog(req, res, next);
-//		log.debug('0000000000000000000000000000000000',req._remoteAddress);
-
         //如果是登录请求，则继续执行后续逻辑
         if (req.originalUrl.indexOf('/login2') === 0) {
             log.trace('SESSION:收到登录请求，不进行session校验。');
@@ -57,12 +53,10 @@ app.use(function (req, res, next) {
             log.trace('SESSION:会话未过期，放行。');
             next();
         }
-
     }
     catch (e) {
         log.error(e);
     }
-
 });
 
 //uploads是url中的访问路径，public/upload则是服务器端的相对路径。
