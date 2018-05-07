@@ -5,7 +5,6 @@ let ut = require('../utils/utils.js');
 let globalData = require('../globalData.js');
 let log = ut.logger(__filename);
 
-
 /**
  * 短信认证码生成
  * @param req
@@ -46,7 +45,6 @@ module.exports.mbsc = function (req, res, err) {
     }
 };
 
-
 /**
  * 手机号唯一性检查
  * @param req
@@ -72,11 +70,11 @@ module.exports.mbck = function (req, res, err) {
 
                 //如user表中已有记录，说明手机号已被占用。
                 if (docs.length > 0) {
-                    res.send(JSON.stringify({msg:'该手机号已被占用，请使用其他手机号。',code:'1'}));
+                    res.send(JSON.stringify({msg: '该手机号已被占用，请使用其他手机号。', code: '1'}));
                 } else {
                     //手机号如未被占用，则调用第三方api，给手机号发送短信验证码。
-                    ut.sendSms(88752,[''+p.mobile+''],['【'+p.smsCode+'】','【'+60+'】']);
-                    res.send(JSON.stringify({msg:'请注意查收短信验证码！',code:'0'}));
+                    ut.sendSms(88752, ['' + p.mobile + ''], ['【' + p.smsCode + '】', '【' + 60 + '】']);
+                    res.send(JSON.stringify({msg: '请注意查收短信验证码！', code: '0'}));
                 }
                 db.close();
             });
@@ -326,7 +324,6 @@ module.exports.login2 = function (req, res2, err) {
         '&js_code=' + req.query.code +
         '&grant_type=authorization_code';
 
-
     //调用微信服务获得
     ut.httpsReq(url, function (result) {
         let r = JSON.parse(result);
@@ -337,33 +334,39 @@ module.exports.login2 = function (req, res2, err) {
         let iv = req.query.iv;
         let encryptedData = req.query.encryptedData;
 
+
         //业务处理1：解密，获得openid等敏感信息的明文
         let WXBizDataCrypt = require('../utils/WXBizDataCrypt');
         let pc = new WXBizDataCrypt(cf.appId, session_key);
         let data = pc.decryptData(encryptedData, iv);
         log.debug('解密后 data: ', data, typeof(data));
 
+        if (data === 'error') {
+            res2.send({'ret': 'error'});
+        } else {
 
-        //业务处理2：生成session3rd
-        ut.getRandom(function (random) {
-            let now = new Date().toLocaleString();
-            //log.debug('生成的随机数值：',random);
-            //将生成的session信息保存在后端，并应答给前端
-            let session3rdKey = random;
-            globalData.session[session3rdKey] = {
-                's': session_key + ']][[' + data.openId,
-                'ct': now,
-                'openId': data.openId,
-                'ut': now
-            };
-            log.debug('生成' + session3rdKey + '后:', globalData.session);
 
-            //每次生成新会话后，联动清理一次超时会话，避免后端内存消耗过大。
-            ut.checkSession(session3rdKey);
+            //业务处理2：生成session3rd
+            ut.getRandom(function (random) {
+                let now = new Date().toLocaleString();
+                //log.debug('生成的随机数值：',random);
+                //将生成的session信息保存在后端，并应答给前端
+                let session3rdKey = random;
+                globalData.session[session3rdKey] = {
+                    's': session_key + ']][[' + data.openId,
+                    'ct': now,
+                    'openId': data.openId,
+                    'ut': now
+                };
+                log.debug('生成' + session3rdKey + '后:', globalData.session);
 
-            //应答前端
-            res2.send({'session3rdKey': session3rdKey, 'ct': now, 'openId': data.openId});//TODO:好好复习，居然可以给前端发送对象
-        });
+                //每次生成新会话后，联动清理一次超时会话，避免后端内存消耗过大。
+                ut.checkSession(session3rdKey);
+
+                //应答前端
+                res2.send({'session3rdKey': session3rdKey, 'ct': now, 'openId': data.openId});//TODO:好好复习，居然可以给前端发送对象
+            });
+        }
 
     });
 
@@ -374,15 +377,11 @@ module.exports.login2 = function (req, res2, err) {
  * 2、检查用户是否为新用户。新用户则在user表中创建一条记录，老用户则返回用户的角色(TODO：手机号等相关信息)给前端。
  */
 module.exports.chck = function (req, res, err) {
-
-
     let p = JSON.parse(req.query.userInfo);
     log.debug('校验用户是否为新用户,收到参数', p);
     let MongoClient = require('mongodb').MongoClient;
 
-
     try {
-
         //1、记录访问日志
         MongoClient.connect(cf.dbUrl, function (err, db) {
             let coll = db.collection('accesslog');
@@ -395,21 +394,17 @@ module.exports.chck = function (req, res, err) {
             coll.insertOne(accessLog, function (err, r) {
                 t.equal(null, err);
                 t.equal(1, r.result.n);
+                db.close();
             });
         });
 
 
-
-
         //2、判断用户是否为新用户
         MongoClient.connect(cf.dbUrl, function (err, db) {
-
             let t = require('assert');
             let coll = db.collection('user');
 
-
             coll.find({"openId": p.openId}, {_id: 0}).toArray(function (err, docs) {
-
                 log.debug('openId=' + p.openId + '的记录为', docs);
 
                 //如user表中有记录，且角色字段不是空，则返回用户的信息，以便前端将界面切换到对应角色的。
@@ -440,10 +435,8 @@ module.exports.chck = function (req, res, err) {
                                 //res.send('0');
                                 res.send(JSON.stringify(p));
                             });
-
                     });
                 }
-
             });
 
             //update返回一个数组，findOneAndUpdate返回一条记录。
@@ -467,6 +460,7 @@ module.exports.chck = function (req, res, err) {
             // });
         });
     } catch (err) {
+        //TODO:所有的后台异常，都应以错误码方式反馈前台，并将异常信息国际化。
         log.error(err);
         db.close();
     }

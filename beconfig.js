@@ -5,7 +5,7 @@
 module.exports = {
 
     //数据库参数
-    dbUrl:'mongodb://100td:27117/test',
+    dbUrl: 'mongodb://100td:27117/' + process.env.DBNAME,
 
     //找工小程序的保密信息
     appId:'wx887e4e9e1c47b47d',                 //小程序的appid
@@ -36,7 +36,7 @@ module.exports = {
         },
         categories:{
             default:{appenders:['out','app'],level:'debug'},
-            utils:{appenders:['out','app'],level:'debug'}
+            utils: {appenders: ['out', 'app'], level: 'trace'}
         }
     }
 

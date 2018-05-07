@@ -8,6 +8,7 @@
   "node_args"	: "--use-strict",
   "env": {
     "NODE_ENV"	: "production",
-    "DEBUG_SDK"	: "yes"
+    "DEBUG_SDK": "yes",
+    "DBNAME": "zgdev"
   }
 }
