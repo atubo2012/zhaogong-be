@@ -319,8 +319,8 @@ module.exports.login2 = function (req, res2, err) {
     log.debug('login2收到请求参数', req.query);
 
     let url = cf.OA_URL_WX_CODE2SESSION +
-        '?appid=' + cf.appId +
-        '&secret=' + cf.secret +
+        '?appid=' + cf.oaCfXcx.appId +
+        '&secret=' + cf.oaCfXcx.secret +
         '&js_code=' + req.query.code +
         '&grant_type=authorization_code';
 
@@ -403,6 +403,7 @@ module.exports.chck = function (req, res, err) {
         MongoClient.connect(cf.dbUrl, function (err, db) {
             let t = require('assert');
             let coll = db.collection('user');
+
 
             coll.find({"openId": p.openId}, {_id: 0}).toArray(function (err, docs) {
                 log.debug('openId=' + p.openId + '的记录为', docs);

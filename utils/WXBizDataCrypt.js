@@ -1,9 +1,10 @@
 let crypto = require('crypto');
-
+let ut = require('../utils/utils.js');
+let log = ut.logger(__filename);
 
 /**
- * https://mp.weixin.qq.com/debug/wxadoc/dev/api/signature.html
  * 本类用于后端程序对加密的用户数据进行解密，获得openid和unionid时使用
+ * 官方参考：https://mp.weixin.qq.com/debug/wxadoc/dev/api/signature.html *
  */
 
 
@@ -35,7 +36,7 @@ WXBizDataCrypt.prototype.decryptData = function (encryptedData, iv) {
 
     let decoded = null;
     try {
-        // 解密
+        // 解密器
         let decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, iv);
         // 设置自动 padding 为 true，删除填充补位
         decipher.setAutoPadding(true);
@@ -44,9 +45,8 @@ WXBizDataCrypt.prototype.decryptData = function (encryptedData, iv) {
         decoded += decipher.final('utf8');
 
         decoded = JSON.parse(decoded)
-
     } catch (err) {
-        console.error('Illegal Buffer', err);
+        log.error('Illegal Buffer', err);
         return "error"
         //throw new Error('Illegal Buffer')
     }

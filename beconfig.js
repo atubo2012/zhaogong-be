@@ -1,26 +1,28 @@
 'use strict';
 /**
  * 全局参数
+ * 敏感类信息，如密码、appid、秘钥等应通过环境变量保存，以免提交到VCS中被他人误用。
+ * 运行类参数，与性能有关的信息，可以明文方式写入本文件。
  */
 module.exports = {
 
     //数据库参数
-    dbUrl: 'mongodb://100td:27117/' + process.env.DBNAME,
+    dbUrl: 'mongodb://' + process.env.SI_ZG_DBURL,
 
     //找工小程序的保密信息
-    appId:'wx887e4e9e1c47b47d',                 //小程序的appid
-    secret:'ac8b39a41258a5e776d5cf4e0b751116',  //小程序的secret
+    appId: process.env.SI_ZG_APPID_XCX,                 //小程序的appid
+    secret: process.env.SI_ZG_APPSE_XCX,  //小程序的secret
 
     //腾讯云SMS开发者ID
     oaCfQQSms :{
-        appid :1400055205,
-        appkey:"58762ca09c9d267881fe980b6a5615df"
+        appid: process.env.SI_ZG_APPID_QQSMS,
+        appkey: process.env.SI_ZG_APPKEY_QQSMS
     },
 
     //腾讯小程序开发者ID
     oaCfXcx :{
-        appid :'wx887e4e9e1c47b47d',
-        appkey:"ac8b39a41258a5e776d5cf4e0b751116"
+        appId: process.env.SI_ZG_APPID_XCX,
+        secret: process.env.SI_ZG_APPSE_XCX
     },
 
     //第三方OPENAPI服务集

@@ -1,7 +1,5 @@
 require('./globals');
 require('./setup-qcloud-sdk');
-//require('./utils/test');    //便于实验室test.js的程序能在nodejs不手动重启的情况下验证。
-
 let ut = require('./utils/utils.js');
 let log = ut.logger(__filename);
 
@@ -32,7 +30,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//log.debug('初始环境变量',process.env);
+log.debug('初始环境变量', process.env);
+
 
 //session校验中间件，避免后端程序中每行都要增加此项内容
 app.use(function (req, res, next) {

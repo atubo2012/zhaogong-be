@@ -1,11 +1,20 @@
 {
   "name"		: "zhaogong",
   "script"		: "bin/www",
-  "cwd"			: "/root/workspace/zhaogong-be",
+  "cwd": "d://zhaogong-be",
   "exec_mode"	: "fork",
   "watch"		: true,
-  "ignore_watch": ["public","public/upload","public",".idea",".git"],
+  "ignore_watch": [
+    "public",
+    "public/upload",
+    "public",
+    ".idea",
+    ".git",
+    ".bat",
+    ".json"
+  ],
   "node_args"	: "--use-strict",
+  "windowsHide": true,
   "env": {
     "NODE_ENV"	: "production",
     "DEBUG_SDK": "yes",

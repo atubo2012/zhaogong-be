@@ -23,7 +23,6 @@ router.get('/user/remove/:Id', bizUser.remove);
 
 /* 学习后端框架期间的样例代码 */
 router.get('/login', require('./login'));
-
 router.get('/user', require('./user'));
 router.all('/tunnel', require('./tunnel'));
 
@@ -56,8 +55,6 @@ router.get('/addrs', bizUser.addrsEdit);//常用地址查询
 /*文件上传模块的核心代码*/
 router.post('/upload',uploadtutil.single('avatar'),function(req,res,next){
     if(req.file){
-        //console.log('4444444444444'+JSON.stringify(req.file));
-        //console.log('4444444444455'+JSON.stringify(req.file.filename));
         //将上传后的文件名作为应答发送给前端程序，用于显示。
         res.send(req.file.filename);
     }
