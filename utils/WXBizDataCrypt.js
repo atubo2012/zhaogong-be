@@ -7,7 +7,6 @@ let log = ut.logger(__filename);
  * 官方参考：https://mp.weixin.qq.com/debug/wxadoc/dev/api/signature.html *
  */
 
-
 /**
  * 构造函数
  * @param appId         小程序申请时分配的appId
@@ -15,6 +14,7 @@ let log = ut.logger(__filename);
  * @constructor
  */
 function WXBizDataCrypt(appId, sessionKey) {
+
     this.appId = appId;
     this.sessionKey = sessionKey;
 }

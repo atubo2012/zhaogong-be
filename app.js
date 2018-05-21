@@ -30,7 +30,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-log.debug('初始环境变量', process.env);
+//log.debug('初始环境变量', process.env);
 
 
 //session校验中间件，避免后端程序中每行都要增加此项内容

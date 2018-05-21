@@ -7,9 +7,16 @@
  * 场景：
  * 本文件中的函数，被业务模块中使用，并在不同的应用中复用。
  *
+ * 样例：
+ * XXX模块中XXX功能
+ *
+ * 流程、算法：
+ *
  * 测试：
  * 使用在ide中使用test.js测试。
  * 执行测试前取消测试代码前的//注释
+ *
+ *
  *
  * 规范：
  * 1、函数定义
@@ -416,5 +423,6 @@ exports.randomString  = function (len){
     return randomString(len);
 };
 //console.log(randomString(4));
+
 
 

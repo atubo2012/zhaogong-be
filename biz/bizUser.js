@@ -11,7 +11,7 @@ let log = ut.logger(__filename);
  * @param res
  * @param err
  */
-module.exports.mbsc = function (req, res, err) {
+module.exports.mbsc2 = function (req, res, err) {
 
     //前后台之间用rdata作为参数名，rdata意为remote data，即远程数据。
     let p = JSON.parse(req.query.rdata);
@@ -46,7 +46,8 @@ module.exports.mbsc = function (req, res, err) {
 };
 
 /**
- * 手机号唯一性检查
+ * 功能：检查user表中是否有该手机号，如有则反馈手机号已被占用。
+ * 场景：用户注册
  * @param req
  * @param res
  * @param err
@@ -73,7 +74,9 @@ module.exports.mbck = function (req, res, err) {
                     res.send(JSON.stringify({msg: '该手机号已被占用，请使用其他手机号。', code: '1'}));
                 } else {
                     //手机号如未被占用，则调用第三方api，给手机号发送短信验证码。
-                    ut.sendSms(88752, ['' + p.mobile + ''], ['【' + p.smsCode + '】', '【' + 60 + '】']);
+                    if (p.sendSms)
+                        ut.sendSms(88752, ['' + p.mobile + ''], ['【' + p.smsCode + '】', '【' + 60 + '】']);
+
                     res.send(JSON.stringify({msg: '请注意查收短信验证码！', code: '0'}));
                 }
                 db.close();
@@ -83,6 +86,33 @@ module.exports.mbck = function (req, res, err) {
         res.send('error:' + err.message);
         log.error(err);
     }
+};
+
+/**
+ * 功能：给指定的手机号发送验证码。
+ * 场景：
+ * 1、绑定新的手机号
+ * 2、多因素认证
+ * @param req openId，mobile，smsCode
+ * @param res
+ * @param err
+ */
+module.exports.mbsc = function (req, res, err) {
+
+    //前后台之间用rdata作为参数名，rdata意为remote data，即远程数据。
+    let p = JSON.parse(req.query.rdata);
+    log.debug('发送验证码', p);
+    try {
+        if (p.sendSms)
+            ut.sendSms(88752, ['' + p.mobile + ''], ['【' + p.smsCode + '】', '【' + 60 + '】']);
+
+        res.send(JSON.stringify({msg: '请注意查收短信验证码！', code: '0'}));
+    } catch (err) {
+        res.send(JSON.stringify({msg: '短信发送异常!', code: '1'}));
+        log.error(err);
+    }
+
+
 };
 
 /**
