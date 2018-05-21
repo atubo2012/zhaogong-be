@@ -8,5 +8,6 @@ before_install:
   - "npm install -g conventional-changelog-cli"
   - "npm install -g conventional-changelog"
   - "npm run changelog"
+  - "npm run version"
 
 install: true
