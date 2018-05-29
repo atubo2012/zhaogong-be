@@ -26,6 +26,8 @@ module.exports.edit = function (req, res, err) {
                 t.equal(null, err);
                 t.equal(1, r.result.n);
                 db.close();
+
+                ut.notify({data: p.userInfo, type: 'N_UIDUPD'});
                 res.send('ok');
             });
 
@@ -40,7 +42,7 @@ module.exports.edit = function (req, res, err) {
 module.exports.detl = function (req, res, err) {
 
     let p = JSON.parse(req.query.userInfo);
-    console.log(JSON.stringify(p));
+    log.debug(JSON.stringify(p));
 
     try {
         let MongoClient = require('mongodb').MongoClient;

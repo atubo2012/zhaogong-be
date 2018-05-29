@@ -3,37 +3,101 @@
 /**
  * Module dependencies.
  */
-
 let app = require('../app');
 let debug = require('debug')('zhaogong-be:server');
 let http = require('http');
+let ut = require('../utils/utils');
+let cf = require('../beconfig.js');
+let log = ut.logger(__filename);
+
+
+/**
+ * Create Emitter for emitting event on special scene
+ */
+const EventEmitter = require('events');
+
+class ZgEmitter extends EventEmitter {
+}
+
+let emt = new ZgEmitter();
+
+//Processing notification
+emt.on('notify', (argsObject) => {
+    let nRules = cf.notifyRules[argsObject.type];
+    log.debug('通知事件如下：', argsObject, nRules);
+
+    //根据模板向wc.js发送消息
+    nRules.wechat ? global.socket.emit('event', {data: argsObject.data, rule: nRules}) : '';
+
+    //TODO:根据短信通知模板给指定手机号发送消息，或将短信发送与wc整合。
+    //nRules.sms? ut.sendSms('tppltId',argsObject.data.mobile,argsObject.data.rule.desc):'';
+
+    //TODO:补充公众号、邮件渠道的发送功能。
+});
+
+//Processing error
+emt.on('error', (argsObject) => {
+    log.error('ZG-Error:error event', argsObject);
+});
+//emt will be referenced by utils.js,
+global.emt = emt;
+
+/**
+ * 进程级捕获未捕捉的异常，避免出现系统进程失效
+ */
+process.on('uncaughtException', (err) => {
+    log.error('ZG-Error:uncaughtException event', err);
+    ut.notify({data: JSON.stringify(err), type: 'N_SUEXPT'});
+});
+
+
 
 /**
  * Get port from environment and store in Express.
  */
-
 let port = normalizePort(process.env.PORT || '80');
 app.set('port', port);
-
 
 /**
  * Create HTTP server.
  */
-
 let server = http.createServer(app);
+
+/**
+ * Create Websocket server for sending/recieving message to/from channel(mail,wechat,sms....)
+ */
+let io = require('socket.io')(server);
+io.on('connection', function (socket) {
+    log.info('Client connected.');
+    global.socket = socket;
+
+    socket.on('message', function (data) {
+        log.info('websocket receive message:', data);
+    });
+    socket.on('event', function (data) {
+        log.info('websocket receive event:', data);
+        eventProcess(data);
+    });
+    socket.on('disconnecting', (reason) => {
+        log.info('websocket disconnecting reason :', reason)
+    });
+    socket.on('disconnect', (reason) => {
+        log.info(' disconnect reason :', reason);
+    });
+});
+
 
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+
 /**
  * Normalize a port into a number, string, or false.
  */
-
 function normalizePort(val) {
     let port = parseInt(val, 10);
 
@@ -68,11 +132,11 @@ function onError(error) {
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+        log.error(bind + ' requires elevated privileges');
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+        log.error(bind + ' is already in use');
       process.exit(1);
       break;
     default:
@@ -89,5 +153,33 @@ function onListening() {
     let bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+    log.info('Listening on ' + bind);
+}
+
+
+function eventProcess(data) {
+    if (/#instruct#/.test(data)) {
+
+        const mobile = data.replace('#instruct#', '').trim();
+
+        let MongoClient = require('mongodb').MongoClient;
+        MongoClient.connect(cf.dbUrl, function (err, db) {
+            let coll = db.collection('user');
+            let t = require('assert');
+
+            coll.updateOne(
+                {'mobile': mobile},
+                {
+                    $set: {rolecfm: true},                        //你好
+                    $currentDate: {'updt': true}
+                },
+                {upsert: true, w: 1}, function (err, r) {
+                    t.equal(null, err);
+                    t.equal(1, r.result.n);
+                    db.close();
+                    ut.notify({data: {'mobile': mobile}, type: 'N_ROCNFM'});
+                });
+
+        });
+    }
 }

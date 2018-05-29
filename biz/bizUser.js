@@ -146,6 +146,8 @@ module.exports.edit = function (req, res, err) {
                     t.equal(null, err);
                     t.equal(1, r.result.n);
                     db.close();
+
+                    ut.notify({data: p, type: 'N_UIFUPD'});
                     res.send('ok');
                 });
 
@@ -411,6 +413,8 @@ module.exports.chck = function (req, res, err) {
     log.debug('校验用户是否为新用户,收到参数', p);
     let MongoClient = require('mongodb').MongoClient;
 
+    //ut.notify({data:p,type:'N_UACCES'});
+
     try {
         //1、记录访问日志
         MongoClient.connect(cf.dbUrl, function (err, db) {
@@ -457,13 +461,11 @@ module.exports.chck = function (req, res, err) {
                             {$set: p, $currentDate: {'updt': true}}, //update
                             {upsert: true, w: 1},                   //option
                             function (err, r) {                     //callback
-                                log.debug('新增的用户信息', r.result.upserted);
                                 t.equal(null, err);
                                 t.equal(1, r.result.n);
                                 db.close();
 
-                                //当前用户是新用户，给前端返回0，表示用户是新用户
-                                //res.send('0');
+                                ut.notify({data: p, type: 'N_UNEWUS'});
                                 res.send(JSON.stringify(p));
                             });
                     });

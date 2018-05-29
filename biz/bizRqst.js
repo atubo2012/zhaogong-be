@@ -15,9 +15,7 @@ module.exports.edit = function (req, res, err) {
      * D：p中仅包括reqID和rdst=0，直接将p作为更新字段列表执行updateOne
      */
 
-    console.log('请求参数1：'+JSON.stringify(p));
-
-    log.debug('请求参数2：',p);
+    log.debug('请求参数：', p);
 
     //如果请求中没有reqId，则说明是新增请求，则生成reqId
     if (p.reqId === '') {
@@ -45,20 +43,19 @@ module.exports.edit = function (req, res, err) {
                     upsert: true,
                     w: 1
                 }, function (err, r) {
-                    t.equal(null, err);
                     log.debug(JSON.stringify(r));
-
+                    t.equal(null, err);
                     db.close();
+
+                    ut.notify({data: p, type: p.stat});
                     res.send('ok');
                 });
         });
-
-
     } catch (err) {
         log.error(err);
     }
-
 };
+
 
 /**
  * 需求单查询列表。分为4类：
@@ -80,20 +77,13 @@ module.exports.list = function (req, res, err) {
 
         //如果请求中有reqId，则按照reqId查询单条
         if (typeof(p.reqId) !== 'undefined') {
-            console.log('按照reqId查询：' + p.reqId);
+            log.debug('按照reqId查询：' + p.reqId);
             cond['reqId'] = p.reqId;
         }else
         {
             cond = p;
         }
 
-        //如果请求中有userInfo，则按照userInfo查询
-        // if (typeof(p.nickName) !== 'undefined') {
-        //
-        //     console.log('按照用户查询：' + p.nickName);
-        //     cond['userInfo.nickName'] = p.nickName;
-        //
-        // }
         log.debug('查询条件cond:' + JSON.stringify(cond));
         let MongoClient = require('mongodb').MongoClient;
         MongoClient.connect(cf.dbUrl, function (err, db) {
@@ -117,13 +107,13 @@ module.exports.remove = function (req, res, err) {
     let p = JSON.parse(req.query.rdata);
     p['recordStatus']='0';
 
-    console.log('将要删除：' + JSON.stringify(p));
+    log.debug('将要删除：' + JSON.stringify(p));
 
     try {
         let MongoClient = require('mongodb').MongoClient;
 
         MongoClient.connect(cf.dbUrl, function (err, db) {
-            console.log("Connection successfully to server");
+            log.debug("Connection successfully to server");
 
             let coll = db.collection('rqst');
             let t = require('assert');
@@ -139,7 +129,7 @@ module.exports.remove = function (req, res, err) {
                     w: 1
                 }, function (err, r) {
                     t.equal(null, err);
-                    console.log(JSON.stringify(r));
+                    log.debug(JSON.stringify(r));
                     db.close();
                     res.send('ok');
                 });
@@ -147,7 +137,7 @@ module.exports.remove = function (req, res, err) {
 
 
     } catch (err) {
-        console.log(err);
+        log.error(err);
     }
 };
 

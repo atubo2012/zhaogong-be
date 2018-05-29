@@ -424,5 +424,35 @@ exports.randomString  = function (len){
 };
 //console.log(randomString(4));
 
+/**
+ * 向指定的ws服务器发送event事件。此函数因为没有关闭，所以会保持连接，仅作为验证，尚未在zg应用中使用
+ * 技术参考：https://socket.io/docs/client-api/#socket-emit-eventname-args-ack
+ * @param url
+ * @param message 消息内容
+ */
+let socketSend = function (url, message) {
+    let socket = require('socket.io-client')(url);
+    l.trace('send message');
+    socket.emit('event', message);
+    //socket.close();
+    //console.log('send message end ');
+};
+exports.socketSend = function (url, message) {
+    return socketSend(url, message);
+};
+//socketSend('http://localhost:3000','this is from utils');
 
 
+/**
+ * 功能：触发一个事件，由监听器对事件进行处理
+ * 算法：
+ * 1、应用、系统相关的状态、活动在埋点处发出事件，由事件处理函数对外进行通知
+ * 2、www启动时，安装时间生成器emt，emt在utils中被引用，进而可被各个业务模块使用
+ * 场景：
+ * 1、业务流程中的埋点，关键场景，如上单、开工、完工等。在db.close()方法后、res.send()前调用。
+ * 2、系统异常时的埋点。在catch中调用
+ * @param argsObject ：形如{data:p,type:'N_UIFUPD'}的参数
+ */
+exports.notify = function (argsObject) {
+    global.emt.emit('notify', argsObject);
+};
