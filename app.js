@@ -63,7 +63,7 @@ app.use(express.static(path.join(__dirname, 'public')));
  * 根据前端发来请求中的head中判断是否包含session3rdKey，来判断是否对会话校验。
  */
 app.use(function (req, res, next) {
-    log.info('session3rdKey' + req.get('session3rdKey'));
+    log.trace('session3rdKey:' + req.get('session3rdKey'));
     try {
 
         //如果传了session3rdKey，则表明需要检查会话
