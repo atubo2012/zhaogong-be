@@ -34,23 +34,50 @@ app.use(express.static(path.join(__dirname, 'public')));
 //log.debug('初始环境变量', process.env);
 
 
-//session校验中间件，避免后端程序中每行都要增加此项内容
+//session校验中间件，避免后端程序中每行都要增加此项内容。20180602，优化为根据header中是否包含session3rdKey判断是否检查会话，由前端程序根据需要来选择是否要求后端校验会话
+// app.use(function (req, res, next) {
+//     try {
+//         //如果是登录请求，则继续执行后续逻辑
+//         if (req.originalUrl.indexOf('/login2') === 0) {
+//             log.trace('SESSION:收到登录请求，不进行session校验。');
+//             next();
+//         }
+//         //如果不是登录请求，则校验会话，若会话过期，则直接应答
+//         else if (!ut.checkSession(req.get('session3rdKey'))) {
+//             log.trace('SESSION:非登录请求，会话已超时，应答中将head.RTCD设置为超时。');
+//             res.set('RTCD', 'RTCD_SESSION_TIMEOUT');
+//             res.send('');
+//         }
+//         //如果会话未过期，则继续执行后续逻辑
+//         else {
+//             log.trace('SESSION:会话未过期，放行。');
+//             next();
+//         }
+//     }
+//     catch (e) {
+//         log.error(e);
+//     }
+// });
+
+/**
+ * 根据前端发来请求中的head中判断是否包含session3rdKey，来判断是否对会话校验。
+ */
 app.use(function (req, res, next) {
+    log.info('session3rdKey' + req.get('session3rdKey'));
     try {
-        //如果是登录请求，则继续执行后续逻辑
-        if (req.originalUrl.indexOf('/login2') === 0) {
-            log.trace('SESSION:收到登录请求，不进行session校验。');
-            next();
-        }
-        //如果不是登录请求，则校验会话，若会话过期，则直接应答
-        else if (!ut.checkSession(req.get('session3rdKey'))) {
-            log.trace('SESSION:非登录请求，会话已超时，应答中将head.RTCD设置为超时。');
-            res.set('RTCD', 'RTCD_SESSION_TIMEOUT');
-            res.send('');
-        }
-        //如果会话未过期，则继续执行后续逻辑
-        else {
-            log.trace('SESSION:会话未过期，放行。');
+
+        //如果传了session3rdKey，则表明需要检查会话
+        if (req.get('session3rdKey')) {
+            if (ut.checkSession(req.get('session3rdKey'))) {
+                log.trace('SESSION:会话未过期，放行。');
+                next();
+            } else {
+                log.trace('SESSION:会话已超时，应答中将head.RTCD设置为超时。');
+                res.set('RTCD', 'RTCD_SESSION_TIMEOUT');
+                res.send('');
+            }
+        } else {
+            log.trace('未收到session3rdKey参数，无需校验会话，放行。');
             next();
         }
     }

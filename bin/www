@@ -27,8 +27,11 @@ emt.on('notify', (argsObject) => {
     log.debug('通知事件如下：', argsObject, nRules);
 
     //根据模板向wc.js发送消息
-    nRules.wechat ? global.socket.emit('event', {data: argsObject.data, rule: nRules}) : '';
-
+    try {
+        nRules.wechat ? global.socket.emit('event', {data: argsObject.data, rule: nRules}) : '';
+    } catch (err) {
+        log.err('发送通知产生异常', err);
+    }
     //TODO:根据短信通知模板给指定手机号发送消息，或将短信发送与wc整合。
     //nRules.sms? ut.sendSms('tppltId',argsObject.data.mobile,argsObject.data.rule.desc):'';
 
@@ -47,9 +50,12 @@ global.emt = emt;
  */
 process.on('uncaughtException', (err) => {
     log.error('ZG-Error:uncaughtException event', err);
-    ut.notify({data: JSON.stringify(err), type: 'N_SUEXPT'});
+    try {
+        ut.notify({data: JSON.stringify(err), type: 'N_SUEXPT'});
+    } catch (err2) {
+        log.error('ut.notify() error:', err2);
+    }
 });
-
 
 
 /**
@@ -101,17 +107,17 @@ server.on('listening', onListening);
 function normalizePort(val) {
     let port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+    if (port >= 0) {
+        // port number
+        return port;
+    }
 
-  return false;
+    return false;
 }
 
 /**
@@ -119,29 +125,28 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
-
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
 
 
     let bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+        ? 'Pipe ' + port
+        : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-        log.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-        log.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            log.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            log.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
 }
 
 /**
@@ -151,8 +156,8 @@ function onError(error) {
 function onListening() {
     let addr = server.address();
     let bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
     log.info('Listening on ' + bind);
 }
 

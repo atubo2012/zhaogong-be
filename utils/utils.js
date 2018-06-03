@@ -434,8 +434,7 @@ let socketSend = function (url, message) {
     let socket = require('socket.io-client')(url);
     l.trace('send message');
     socket.emit('event', message);
-    //socket.close();
-    //console.log('send message end ');
+
 };
 exports.socketSend = function (url, message) {
     return socketSend(url, message);

@@ -93,14 +93,14 @@ module.exports.edit = function (req, res, err) {
 
 /**
  * 用户评价查询中有3类情况，查询cmmt表的用户印象
- * 1、查看我收到的评价：{type:tome,   assesseeOpenId:前端app.globalData.userInfo.openId}。list（前端功能入口在我的模块中）
- * 2、查看TA收到的评价，{type:tohim,  assesseeOpenId:前端从页面参数中取得assesseeOpenId}  。 list（前端功能入口在阿姨详情中进入评价列表）
- * 3、查看我发出的评价，{type:isend,  observerOpenId:前端app.globalData.userInfo.openId}。list（前端功能入口在我的模块中）
- * 4、查看TA发出的评价，{type:hesend, observerOpenId:前端app.globalData.userInfo.openId}。list（前端功能入口在阿姨详情中进入评价列表）
+ * 1、查看我收到的评价：{mode:tome,   assesseeOpenId:前端app.globalData.userInfo.openId}。list（前端功能入口在我的模块中）
+ * 2、查看TA收到的评价，{mode:tohim,  assesseeOpenId:前端从页面参数中取得assesseeOpenId}  。 list（前端功能入口在阿姨详情中进入评价列表）
+ * 3、查看我发出的评价，{mode:isend,  observerOpenId:前端app.globalData.userInfo.openId}。list（前端功能入口在我的模块中）
+ * 4、查看TA发出的评价，{mode:hesend, observerOpenId:前端app.globalData.userInfo.openId}。list（前端功能入口在阿姨详情中进入评价列表）
  *
  * 用户印象中有两类情况，查询user表的用户印象。done
- * 1、查看他的印象，   {type:hisimp, openId:前端从页面参数中取得assesseeOpenId}
- * 2、查看我的印象，   {type:myimp,  openId:前端app.globalData.userInfo.openId}
+ * 1、查看他的印象，   {mode:hisimp, openId:前端从页面参数中取得assesseeOpenId}
+ * 2、查看我的印象，   {mode:myimp,  openId:前端app.globalData.userInfo.openId}
  */
 module.exports.list = function (req, res, err) {
 
@@ -114,14 +114,14 @@ module.exports.list = function (req, res, err) {
         let collection = '';
 
         //根据控制参数设置将从哪个collection中取数
-        if (p.type === 'hisimp' || p.type === 'myimp') {
+        if (p.mode === 'hisimp' || p.mode === 'myimp') {
             collection = 'user';        //查询某个用户的印象标签
 
         } else if (                     //查询某个用户相关的评论信息，从cmmt表中查询
-            p.type === 'tome' ||        //我收到的：assesseeOpenId=openId
-            p.type === 'isend' ||       //我发出的：observerOpenId=openId
-            p.type === 'tota' ||        //ta收到的：assesseeOpenId=openId
-            p.type === 'tasend'         //ta发出的：observerOpenId=openId
+        p.mode === 'tome' ||        //我收到的：assesseeOpenId=openId
+        p.mode === 'isend' ||       //我发出的：observerOpenId=openId
+        p.mode === 'tota' ||        //ta收到的：assesseeOpenId=openId
+        p.mode === 'tasend'         //ta发出的：observerOpenId=openId
         )
         {
             collection = 'cmmt';
@@ -135,12 +135,12 @@ module.exports.list = function (req, res, err) {
             // delete cond.assesseeOpenId;
             // delete cond.openId;
         }else{
-            log.error('type的值非法:',p.type);
+            log.error('mode的值非法:', p.mode);
             return;
         }
 
         //删除前端传入的控制类属性
-        delete cond.type;
+        delete cond.mode;
         log.debug('查询条件cond:' + JSON.stringify(cond));
 
         let MongoClient = require('mongodb').MongoClient;
