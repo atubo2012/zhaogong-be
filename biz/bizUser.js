@@ -258,8 +258,7 @@ module.exports.addrList = function (req, res, err) {
 module.exports.addrsEdit = function (req, res, err) {
     try {
 
-        ut.reqLog(req, res, err);
-
+        log.debug('地址修改请求参数:', req, res, err);
 
         let userInfo; //用户信息
         let rdata;//业务信息
@@ -277,6 +276,9 @@ module.exports.addrsEdit = function (req, res, err) {
             log.debug(userInfo);
         }
 
+        if (!userInfo) {
+            log.warn('userInfo为空:', userInfo);
+        }
 
         let MongoClient = require('mongodb').MongoClient;
 
