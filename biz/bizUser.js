@@ -258,7 +258,7 @@ module.exports.addrList = function (req, res, err) {
 module.exports.addrsEdit = function (req, res, err) {
     try {
 
-        log.debug('地址修改请求参数:', req, res, err);
+        log.trace('地址修改请求参数:', req.body, req.query);
 
         let userInfo; //用户信息
         let rdata;//业务信息

@@ -30,7 +30,7 @@ emt.on('notify', (argsObject) => {
     try {
         nRules.wechat ? global.socket.emit('event', {data: argsObject.data, rule: nRules}) : '';
     } catch (err) {
-        log.err('发送通知产生异常', err);
+        log.error('发送通知产生异常', err);
     }
     //TODO:根据短信通知模板给指定手机号发送消息，或将短信发送与wc整合。
     //nRules.sms? ut.sendSms('tppltId',argsObject.data.mobile,argsObject.data.rule.desc):'';

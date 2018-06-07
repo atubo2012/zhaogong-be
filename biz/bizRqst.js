@@ -79,6 +79,8 @@ module.exports.list = function (req, res, err) {
         if (typeof(p.reqId) !== 'undefined') {
             log.debug('按照reqId查询：' + p.reqId);
             cond['reqId'] = p.reqId;
+
+            //TODO:如果是单条查询，则在应答中增加评价记录，便于展现和隐藏“评价按钮”
         }else
         {
             cond = p;

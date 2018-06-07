@@ -455,3 +455,20 @@ exports.socketSend = function (url, message) {
 exports.notify = function (argsObject) {
     global.emt.emit('notify', argsObject);
 };
+
+
+exports.obj2queryString = function obj2queryString(args) {
+    let keys = Object.keys(args);
+    keys = keys.sort();
+    let newArgs = {};
+    keys.forEach(function (key) {
+        newArgs[key.toLowerCase()] = args[key];
+    });
+
+    let str = '';
+    for (let k in newArgs) {
+        str += '&' + k + '=' + newArgs[k];
+    }
+    str = str.substr(1);
+    return str;
+};

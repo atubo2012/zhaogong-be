@@ -4,6 +4,7 @@ let bizUser = require('../biz/bizUser.js');
 let bizLbor = require('../biz/bizLbor.js');
 let bizRqst = require('../biz/bizRqst.js');
 let bizCmmt = require('../biz/bizCmmt.js');
+let bizPay = require('../biz/bizPay.js');
 let uploadtutil = require('./uploadutil.js');
 
 /* GET home page. 验证express框架是否就绪的web页面*/
@@ -50,6 +51,9 @@ router.post('/addrs2', bizUser.addrEdit2);//常用地址更新
 
 router.post('/addrs', bizUser.addrsEdit);//常用地址更新
 router.get('/addrs', bizUser.addrsEdit);//常用地址查询
+
+router.all('/wxpay', bizPay.pay);//常用地址查询
+router.all('/wxpaycb', bizPay.paycb);//常用地址查询
 
 
 /*文件上传模块的核心代码*/
