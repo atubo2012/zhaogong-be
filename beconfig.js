@@ -37,7 +37,7 @@ module.exports = {
             app: {type: 'file', filename: '/root/.pm2/logs/zg.log', maxLogSize: 2048000, backups: 3, compress: true},
         },
         categories: {
-            default: {appenders: ['out', 'app'], level: 'trace'},
+            default: {appenders: ['out', 'app'], level: 'debug'},
             utils: {appenders: ['out', 'app'], level: 'debug'}
         }
     },
