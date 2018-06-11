@@ -82,7 +82,7 @@ module.exports = {
         Mch_id: process.env.SI_ZG_MCHT_ID,     //商户号
         Mch_key: process.env.SI_ZG_MCHT_KEY,   //商户key
 
-        notify_url: process.env.SI_ZG_URL_AFTERPAY,
+        notify_url: process.env.SI_ZG_PAY_NOTIFY_URL, //支付成功后的回调
 
         // 生成商户订单号
         getWxPayOrdrID: function () {

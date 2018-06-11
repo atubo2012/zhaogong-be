@@ -54,6 +54,7 @@ router.get('/addrs', bizUser.addrsEdit);//常用地址查询
 
 router.all('/wxpay', bizPay.pay);//常用地址查询
 router.all('/wxpaycb', bizPay.paycb);//常用地址查询
+router.all('/wxpayquery', bizPay.payquery);//常用地址查询
 
 
 /*文件上传模块的核心代码*/

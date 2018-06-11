@@ -457,7 +457,19 @@ exports.notify = function (argsObject) {
 };
 
 
-exports.obj2queryString = function obj2queryString(args) {
+/**
+ * 功能：将对象转换成“查询字符串”，查询参数按照字母表排序
+ *
+ * 场景：对拟支付订单的信息进行签名。
+ *
+ * @param args         订单数据
+ * @returns {string}   查询字符串
+ */
+exports.obj2queryString = function (args) {
+    return obj2queryString(args);
+};
+
+let obj2queryString = function (args) {
     let keys = Object.keys(args);
     keys = keys.sort();
     let newArgs = {};
@@ -470,5 +482,33 @@ exports.obj2queryString = function obj2queryString(args) {
         str += '&' + k + '=' + newArgs[k];
     }
     str = str.substr(1);
+
+    l.trace('对象->String:', str);
     return str;
+};
+
+exports.paysignjsapi2 = function paysignjsapi2(payApplyInfo) {
+
+    let str = obj2queryString(payApplyInfo);
+    str = str + '&key=' + cf.wxPay.Mch_key;
+    l.trace('paysign2 string', str);
+
+    let md5Str = require('crypto').createHash('md5').update(str).digest('hex');
+    l.trace('paysign2 md5Str', md5Str);
+
+    md5Str = md5Str.toUpperCase();
+    l.trace('paysign2 up md5Str', md5Str);
+
+    return md5Str;
+};
+
+exports.wxpayArray2Object = function wxpayArray2Object(wxpayArray) {
+
+    let ret = {};
+    let keys = Object.keys(wxpayArray);
+    keys = keys.sort();
+    keys.forEach(function (key) {
+        ret[key.toLowerCase()] = wxpayArray[key][0];
+    });
+    return ret;
 };
