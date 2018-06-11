@@ -14,10 +14,7 @@ module.exports.payquery = function (req1, res1, err) {
     log.debug('支付结果查询RP:', param);
 
     //例行字段
-    let nonce_str = '';
-    ut.getRandom((r) => {
-        nonce_str = r;
-    }); // 随机字符串
+    let nonce_str = ut.randomString();
     let timestamp = Math.round(new Date().getTime() / 1000); // 当前时间
 
     //业务字段
@@ -176,10 +173,7 @@ module.exports.pay = function (req1, res1, err) {
 
     //例行字段
     let spbill_create_ip = req1.ip.replace(/::ffff:/, '');//'115.159.128.224';//'127.0.0.1'; // 获取客户端ip
-    let nonce_str = '';
-    ut.getRandom((r) => {
-        nonce_str = r;
-    }); // 随机字符串
+    let nonce_str = ut.randomString();
     let timestamp = Math.round(new Date().getTime() / 1000); // 当前时间
     log.debug('统一支付请求2:');
 
