@@ -9,12 +9,14 @@ let favicon = require('serve-favicon');
 let logger = require('morgan');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
+require('body-parser-xml')(bodyParser);
 
 
 let index = require('./routes/index');
 let users = require('./routes/users');
 
 let app = express();
+
 
 
 // view engine setup
@@ -28,6 +30,14 @@ app.set('view engine', 'jade');
 app.use(logger('combined', {skip: function (req, res) { return res.statusCode <= 200 }}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.xml({
+    limit: '2MB',   // Reject payload bigger than 1 MB
+    xmlParseOptions: {
+        normalize: true,     // Trim whitespace inside text nodes
+        normalizeTags: true, // Transform tags to lowercase
+        explicitArray: false // Only put nodes in array if >1
+    }
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 

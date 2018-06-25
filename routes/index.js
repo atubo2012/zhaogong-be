@@ -38,10 +38,12 @@ router.get('/cmmt-edit', bizCmmt.edit); //新增、更新时使用此方法
 
 router.get('/lbor-detl', bizLbor.detl);//LB详情
 router.get('/lbor-edit', bizLbor.edit);//LB编辑
+router.get('/lbor-list', bizLbor.list);//LB编辑
 
 router.get('/login2', bizUser.login2);//登录获取用户的openid
 router.get('/user-chck', bizUser.chck);//用户检查
 router.get('/user-edit', bizUser.edit);//用户注册和信息修改
+router.get('/user-list', bizUser.list);//用户注册和信息修改
 
 router.get('/user-mbck', bizUser.mbck);//手机号唯一性检查
 router.get('/user-mbsc', bizUser.mbsc);//获取动态码

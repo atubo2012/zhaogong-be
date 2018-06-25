@@ -247,7 +247,7 @@ exports.getId = function (idPrefix) {
     return getId(idPrefix)
 };
 let getId = function (idPrefix) {
-    let ts = (new Date().getTime()).toFixed(0);
+    let ts = (new Date().getTime()).toFixed(0) + '-' + randomString('4');
     return idPrefix + ts;
 };
 
@@ -510,5 +510,31 @@ exports.wxpayArray2Object = function wxpayArray2Object(wxpayArray) {
     keys.forEach(function (key) {
         ret[key.toLowerCase()] = wxpayArray[key][0];
     });
+    return ret;
+};
+
+/**
+ * 功能：将形如$0,$1的占位符，替换成话术
+ * 场景：向用户发送通知类信息时
+ * @param jsonData JSON格式的数据
+ * @param fields 话术中包含的数据字段(数组)，按照先后顺序
+ * @param words  话术模板
+ * @returns {*}
+ */
+exports.getSpeakSpec = function (jsonData, fields, words) {
+    let ret = words;
+    for (let i = 0; i < fields.length; i++) {
+        let a = '$' + i;
+        let item = fields[i];
+
+        //若列名中有星号，则对内容中的数字进行脱敏处理。
+        if (item.indexOf('*') >= 0) {
+            item = item.replace('*', '');
+            ret = ret.replace(a, jsonData[item].replace(/[\d]/g, '*'));
+        } else {
+            ret = ret.replace(a, jsonData[item]);
+        }
+
+    }
     return ret;
 };

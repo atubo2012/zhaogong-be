@@ -338,6 +338,33 @@ module.exports.addrsEdit = function (req, res, err) {
     }
 };
 
+
+module.exports.list = function (req, res, err) {
+
+    try {
+        let p = req.query || req.params;
+        log.debug(p, typeof(p), typeof(p.query));
+        let cond = JSON.parse(p.cond);
+
+
+        ut.info('查询条件cond:', cond);
+        let MongoClient = require('mongodb').MongoClient;
+        MongoClient.connect(cf.dbUrl, function (err, db) {
+
+            let coll = db.collection('user');
+
+            coll.find(cond.query).sort({'updt': -1}).skip(cond.skip).limit(cond.limit).toArray(function (err, docs) {
+                log.debug(docs);
+                res.send(JSON.stringify(docs)); //将后端将数据以JSON字符串方式返回，前端以query.data获取数据。
+                db.close();
+            });
+        });
+
+    } catch (err) {
+        log.error(err);
+    }
+};
+
 /**
  * 根据code获取session_key，并生成3rd_session
  * @param req
@@ -413,26 +440,27 @@ module.exports.login2 = function (req, res2, err) {
 module.exports.chck = function (req, res, err) {
     let p = JSON.parse(req.query.userInfo);
     log.debug('校验用户是否为新用户,收到参数', p);
+
+
     let MongoClient = require('mongodb').MongoClient;
-
-    //ut.notify({data:p,type:'N_UACCES'});
-
     try {
-        //1、记录访问日志
-        MongoClient.connect(cf.dbUrl, function (err, db) {
-            let coll = db.collection('accesslog');
-            let t = require('assert');
 
-            //生成日期、组合成访问日志
-            let accessLog = {ct: new Date(), action: 'check'};
-            Object.assign(accessLog, p);
 
-            coll.insertOne(accessLog, function (err, r) {
-                t.equal(null, err);
-                t.equal(1, r.result.n);
-                db.close();
-            });
-        });
+        //1、记录访问日志的功能应该保留在中间件中。
+        // MongoClient.connect(cf.dbUrl, function (err, db) {
+        //     let coll = db.collection('accesslog');
+        //     let t = require('assert');
+        //
+        //     //生成日期、组合成访问日志
+        //     let accessLog = {ct: new Date(), action: 'check'};
+        //     Object.assign(accessLog, p);
+        //
+        //     coll.insertOne(accessLog, function (err, r) {
+        //         t.equal(null, err);
+        //         t.equal(1, r.result.n);
+        //         db.close();
+        //     });
+        // });
 
 
         //2、判断用户是否为新用户

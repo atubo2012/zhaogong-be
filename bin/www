@@ -28,7 +28,39 @@ emt.on('notify', (argsObject) => {
 
     //根据模板向wc.js发送消息
     try {
+        log.debug('send to rooms1', {data: argsObject.data, rule: nRules});
         nRules.wechat ? global.socket.emit('event', {data: argsObject.data, rule: nRules}) : '';
+
+
+        //如果rooms都存在，则向多个群发送
+        if (nRules.fields && nRules.wechat && nRules.rooms) {
+
+            //根据fields属性组装要发送的内容
+            let notifyContent = {};
+            nRules.fields.forEach((item, index, arr) => {
+
+                //如果列名中包含*号，则对带星字段的数据屏蔽处理
+                if (item.indexOf('*') >= 0) {
+                    item = item.replace('*', '');
+                    //console.log('888888888888888888888',argsObject.data[item]);
+                    notifyContent[item] = argsObject.data[item].replace(/[\d]/g, '*')
+                } else {
+                    notifyContent[item] = argsObject.data[item];
+                }
+            });
+
+            let currentRule = nRules;
+            nRules.rooms.forEach((item, index, arr) => {
+                setTimeout(() => {
+                    currentRule.room = item;
+                    log.debug('send to rooms2', {data: notifyContent, rule: {room: item, desc: nRules.desc}});
+                    let data = ut.getSpeakSpec(notifyContent, nRules.fields, nRules.words);
+                    global.socket.emit('event', {data: data, rule: {room: item, desc: nRules.desc}})
+                    //global.socket.emit('event', {data: notifyContent, rule: {room:item,desc:nRules.desc}})
+                }, 2000)
+            })
+        }
+
     } catch (err) {
         log.error('发送通知产生异常', err);
     }
@@ -99,6 +131,27 @@ io.on('connection', function (socket) {
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+
+///////////////////////////////////////////
+// const WebSocketServer = require('ws').Server;
+// let wsServer = new WebSocketServer({port:8080});
+// wsServer.on('connection', function (ws) {
+//     console.log('client connect');
+//     ws.on('message', function (message) {
+//         console.log('Received: '+ message);
+//     });
+//
+//     let data=[{id:'10001'}];
+//     ws.send(data,function (err) {
+//         if(!err){
+//             console.log('success');
+//         }else{
+//             throw err;
+//         }
+//     })
+// });
+///////////////////////////////////////////
 
 
 /**

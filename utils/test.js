@@ -1,3 +1,4 @@
+
 /**
  * 本程序是体验javascript特性或openapi的的实验室文件(lib)。
  *
@@ -13,7 +14,8 @@
  */
 
 let cf = require('../beconfig.js');
-
+let ut = require('./utils.js');
+let log = ut.logger(__filename);
 
 /**
  * 获得环境变量信息，可以从process.env.NODE_ENV中获取process.json配置的NODE_ENV等类似的环境变量
@@ -220,4 +222,71 @@ let cf = require('../beconfig.js');
 //   }
 // }
 
+// ut.httpsReq('www.sojson.com/open/api/weather/json.shtml?city=上海',
+//     (result) => {
+//         console.log(result);
+//         let r = JSON.parse(result);
+//     }
+// );
+
+let body = ''
+
+// const https = require('https');
+//
+// const options = {
+//     host: 'api.mch.weixin.qq.com',
+//     port:'443',
+//     path:'/pay/unifiedorder',
+//     method: 'POST',
+// };
+//
+// const req = https.request(options, (res) => {
+//     console.log('statusCode:', res.statusCode);
+//     console.log('headers:', res.headers);
+//
+//     res.on('data', (d) => {
+//         process.stdout.write(d);
+//     });
+// });
+//
+// req.on('error', (e) => {
+//     console.error(e);
+// });
+// req.end();
+
+
+// let param = {'openid':'aasdfsdfsopenid','body':'body1223232'}
+// let xml2js = require('xml2js');
+// let bodyOfRqst = ['openid', 'body', 'total_fee', 'product_id', 'out_trade_no'];
+// let bodyDataObj = {
+//     'appid': 'aaa1',
+//     'mch_id': 'aaa2',
+//     'nonce_str': 'aaa3',
+//     'notify_url': 'aaa4',
+//     'spbill_create_ip': 'aaa5',
+//     'trade_type': 'JSAPI'
+// };
+// bodyOfRqst.map((item, index, arr) => {
+//     bodyDataObj[item] = param[item]
+// });
+// bodyDataObj['sign']=ut.paysignjsapi2(bodyDataObj);
+// let  builder = new xml2js.Builder({'rootName':'xml','headless':true});
+// let  xml = builder.buildObject(bodyDataObj);
+// log.debug('xml builded:============================',xml);
+
+console.log(ut.wxpayArray2Object({return_code: ['success'], return_msg: ['ok']}));
+
+
+let jsonData = {'clfn': '孙倩', 'sex': '先生', 'uprice': '34', 'dura': '5', '*addr': '天山西路', 'osdt': 'aaab', 'ostm': 'bbb'};
+let fields = ['clfn', 'sex', 'uprice', 'dura', '*addr', 'osdt', 'ostm'];
+let words = '客户$0$1发布订单：$2元1小时，做$3小时，地点$4，上门时间$5 $6';
+// function getSpeakSpec(fields,words) {
+//     for(let i = 0;i<fields.length;i++){
+//         let a = '$'+i;
+//         //console.log(words);
+//         words = words.replace(a,fields[i])
+//     }
+//
+//     console.log(words);
+// }
 

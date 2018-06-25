@@ -302,7 +302,7 @@ module.exports.pay = function (req1, res1, err) {
  * @param err
  */
 module.exports.paycb = function (req1, res1, err) {
-    log.info('微信支付回调:', req1.query, req1.params);
+    log.info('微信支付回调:', req1.query, req1.params, req1.body);
     //TODO此处应该将回到结果和时间戳更新到订单中，以便对账。
 };
 

@@ -69,9 +69,30 @@ module.exports.detl = function (req, res, err) {
     }
 };
 
-//todo:查看服务人员清单
 module.exports.list = function (req, res, err) {
 
+    try {
+        let p = req.query || req.params;
+        log.debug(p, typeof(p), typeof(p.query));
+        let cond = JSON.parse(p.cond);
+
+
+        ut.info('查询条件cond:', cond);
+        let MongoClient = require('mongodb').MongoClient;
+        MongoClient.connect(cf.dbUrl, function (err, db) {
+
+            let coll = db.collection('rqst');
+
+            coll.find(cond.query).sort({'updt': -1}).skip(cond.skip).limit(cond.limit).toArray(function (err, docs) {
+                log.debug(docs);
+                res.send(JSON.stringify(docs)); //将后端将数据以JSON字符串方式返回，前端以query.data获取数据。
+                db.close();
+            });
+        });
+
+    } catch (err) {
+        log.error(err);
+    }
 };
 
 module.exports.remove = function (req, res, err) {
