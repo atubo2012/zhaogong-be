@@ -31,7 +31,6 @@ router.get('/login', require('./login'));
 router.get('/user', require('./user'));
 router.all('/tunnel', require('./tunnel'));
 
-
 /*找工APP相关模块的service*/
 router.get('/rqst-list', bizRqst.list);//查询需求单
 router.get('/rqst-edit', bizRqst.edit); //新增、更新时使用此方法
