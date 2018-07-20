@@ -14,6 +14,10 @@ router.get('/', function(req, res, next) {
 router.get('/users', function(req, res, next) {
     res.send('/users access ok');
 });
+router.get('/RuWr1VprNj.txt', express.static('./public/RuWr1VprNj.txt'));
+
+
+
 
 /* 用来验证post、get请求，业务模块封装以及数据库访问的样例*/
 router.post('/user/insert'  , bizUser.insert);
@@ -59,6 +63,25 @@ router.all('/wxpaycb', bizPay.paycb);//常用地址查询
 router.all('/wxpayquery', bizPay.payquery);//常用地址查询
 
 
+router.get('/uploadrm', function (req, res, next) {
+
+    let rmfile = JSON.parse(req.query.rdata).rmfile;
+    rmfile = process.env.SI_ZG_UPLOAD_DIR + rmfile.substring(rmfile.indexOf('upload/'));
+
+
+    if (rmfile) {
+        let fs = require('fs');
+        try {
+            fs.unlink(rmfile);
+            console.log('删除文件:' + rmfile);
+            res.send('删除成功');
+        } catch (e) {
+            console.error('删除文件时错误:' + rmfile);
+            res.send('删除失败:' + rmfile);
+        }
+    }
+});
+
 /*文件上传模块的核心代码*/
 router.post('/upload',uploadtutil.single('avatar'),function(req,res,next){
     if(req.file){
@@ -66,5 +89,6 @@ router.post('/upload',uploadtutil.single('avatar'),function(req,res,next){
         res.send(req.file.filename);
     }
 });
+
 
 module.exports = router;
