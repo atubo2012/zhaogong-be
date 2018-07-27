@@ -8,14 +8,26 @@ let debug = require('debug')('zhaogong-be:server');
 let http = require('http');
 let ut = require('../utils/utils');
 let cf = require('../beconfig.js');
+let globalData = require('../globalData.js');
 let log = ut.logger(__filename);
+let schedule = require("node-schedule");
 
+
+/**
+ * 系统启动时获取access_token，便于后续调用微信各类接口时使用。
+ * 并且每隔一段时间刷新access_token。
+ */
+ut.refreshAT();
+
+// API:https://www.npmjs.com/package/node-schedule
+schedule.scheduleJob('*/' + cf.oaCfXcx.access_token_timeout + ' * * * *', function () {
+    ut.refreshAT();
+});
 
 /**
  * Create Emitter for emitting event on special scene
  */
 const EventEmitter = require('events');
-
 class ZgEmitter extends EventEmitter {
 }
 

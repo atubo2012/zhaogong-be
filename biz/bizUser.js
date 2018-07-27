@@ -41,7 +41,7 @@ module.exports.mbsc2 = function (req, res, err) {
 
     } catch (err) {
         res.send('error:' + err.message);
-        console.log('================' + err.message);
+        log.error('================' + err.message);
     }
 };
 
@@ -155,7 +155,7 @@ module.exports.edit = function (req, res, err) {
 
     } catch (err) {
         res.send('error:' + err.message);
-        console.log('================' + err.message);
+        log.error('================' + err.message);
     }
 };
 
@@ -290,7 +290,6 @@ module.exports.addrsEdit = function (req, res, err) {
             //生成日期、组合成访问日志
             let accessLog = {ct: new Date(), action: 'addrsEdit'};
             Object.assign(accessLog, userInfo, rdata);
-            //console.log(JSON.stringify(accessLog));
 
             coll.insertOne(accessLog, function (err, r) {
                 t.equal(null, err);
@@ -333,7 +332,7 @@ module.exports.addrsEdit = function (req, res, err) {
 
         });
     } catch (err) {
-        ut.error(err);
+        log.error(err);
         db.close();
     }
 };
@@ -405,7 +404,6 @@ module.exports.login2 = function (req, res2, err) {
         if (data === 'error') {
             res2.send({'ret': 'error'});
         } else {
-
 
             //业务处理2：生成session3rd
             ut.getRandom(function (random) {

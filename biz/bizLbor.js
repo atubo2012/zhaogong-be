@@ -12,7 +12,7 @@ module.exports.edit = function (req, res, err) {
     //前后台之间用rdata作为参数名，rdata意为remote data，即远程数据。
     let p = JSON.parse(req.query.rdata);
 
-    ut.reqLog(req, res, err);
+    log.debug(req, res, err);
     try {
 
 

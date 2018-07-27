@@ -79,18 +79,6 @@ module.exports.payquery = function (req1, res1, err) {
                         log.trace('result=', result, 'ret=', resultObj);
 
                         if (resultObj.return_code === 'SUCCESS') {
-                            /**
-                             * Testing for signature of response data from wepay
-                             * @type {*|string|string}
-                             */
-                            // let oldsign = ret.sign;
-                            // delete ret.sign;
-                            // let signString = ut.obj2queryString(ret);
-                            // log.trace('生成签名字符串：',signString);
-                            // let newSign = ut.paysignjsapi2(ret);
-                            // log.trace('生成新签名：',newSign);
-                            // console.log('老签名：',oldsign,'新签名',newSign);
-
 
                             /**
                              * 将reqId === out_trade_no对应的记录，更新stat状态为paid_success，补充transaction_id
@@ -282,7 +270,7 @@ module.exports.pay = function (req1, res1, err) {
         });
 
         req2.on('error', (e) => {
-            console.error(e);
+            log.error(e);
         });
 
         //向微信支付发送统一下单请求
@@ -290,7 +278,7 @@ module.exports.pay = function (req1, res1, err) {
         req2.end();
     } catch (e) {
         res1.send(e);
-        console.error(e)
+        log.error(e)
     }
 
 };

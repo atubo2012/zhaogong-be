@@ -105,7 +105,6 @@ module.exports.edit = function (req, res, err) {
 module.exports.list = function (req, res, err) {
 
     let p = req.query;
-
     log.debug('需求单list，前端传入的参数：', p);
 
     try {

@@ -1,11 +1,18 @@
 let express = require('express');
 let router = express.Router();
+
+let cf = require('../beconfig.js');
+let ut = require('../utils/utils.js');
+let log = ut.logger(__filename);
 let bizUser = require('../biz/bizUser.js');
+let uploadtutil = require('./uploadutil.js');
+
 let bizLbor = require('../biz/bizLbor.js');
 let bizRqst = require('../biz/bizRqst.js');
 let bizCmmt = require('../biz/bizCmmt.js');
 let bizPay = require('../biz/bizPay.js');
-let uploadtutil = require('./uploadutil.js');
+let bizServMsg = require('../biz/bizServMsg.js');
+
 
 /* GET home page. 验证express框架是否就绪的web页面*/
 router.get('/', function(req, res, next) {
@@ -57,9 +64,11 @@ router.post('/addrs2', bizUser.addrEdit2);//常用地址更新
 router.post('/addrs', bizUser.addrsEdit);//常用地址更新
 router.get('/addrs', bizUser.addrsEdit);//常用地址查询
 
-router.all('/wxpay', bizPay.pay);//常用地址查询
-router.all('/wxpaycb', bizPay.paycb);//常用地址查询
-router.all('/wxpayquery', bizPay.payquery);//常用地址查询
+router.all('/wxpay', bizPay.pay);//支付
+router.all('/wxpaycb', bizPay.paycb);//支付回调测试
+router.all('/wxpayquery', bizPay.payquery);//支付结果查询
+
+router.all('/msgpush', bizServMsg.msgpush);//客服信息推送。由微信服务器收到客户消息后会发送到本接口
 
 
 router.get('/uploadrm', function (req, res, next) {
@@ -67,15 +76,14 @@ router.get('/uploadrm', function (req, res, next) {
     let rmfile = JSON.parse(req.query.rdata).rmfile;
     rmfile = process.env.SI_ZG_UPLOAD_DIR + rmfile.substring(rmfile.indexOf('upload/'));
 
-
     if (rmfile) {
         let fs = require('fs');
         try {
             fs.unlink(rmfile);
-            console.log('删除文件:' + rmfile);
+            log.debug('删除文件:' + rmfile);
             res.send('删除成功');
         } catch (e) {
-            console.error('删除文件时错误:' + rmfile);
+            log.error('删除文件时错误:' + rmfile);
             res.send('删除失败:' + rmfile);
         }
     }
@@ -89,5 +97,111 @@ router.post('/upload',uploadtutil.single('avatar'),function(req,res,next){
     }
 });
 
+/**
+ router.post('/msgpush', function (req, res, next) {
+    try{
+            console.log(req.query,req.params,req.body);
+            res.send('success');
+            let http = require('https');
+
+            const postData = JSON.stringify({
+                "touser":req.body.FromUserName,
+                "msgtype":"text",
+                "text":
+                    {
+                        "content":"Hello World"
+                    }
+            });
+            const options = {
+                host: 'api.weixin.qq.com',
+                port: '443',
+                path: '/cgi-bin/message/custom/send?access_token=zhaogongisperfect',
+                method: 'POST',
+            };
+
+
+        const tokenOptions = {
+            host: 'api.weixin.qq.com',
+            port: '443',
+            path: '/api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='+cf.appId+'&secret='+cf.secret,
+            method: 'GET',
+        };
+
+        let ret0 = [];
+        const req0 = http.request(tokenOptions,(res0)=>{
+            res0.on('data', (chunk) => {
+                ret0.push(chunk);
+                console.log(`token BODY: ${chunk}`);
+            });
+            res0.on('end', () => {
+                console.log('result:',Buffer.concat(ret0));
+                console.log('No more data in response.');
+            });
+        });
+
+
+        const req1 = http.request(options, (res) => {
+            console.log(`STATUS: ${res.statusCode}`);
+            console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+            res.setEncoding('utf8');
+            let ret = [];
+            res.on('data', (chunk) => {
+                ret.push(chunk);
+                console.log(`BODY: ${chunk}`);
+            });
+            res.on('end', () => {
+                console.log('result:',Buffer.concat(ret));
+                console.log('No more data in response.');
+            });
+        });
+        req1.on('error', (e) => {
+            console.log(`problem with request: ${e.message}`);
+        });
+        req1.write(postData);
+        req1.end();
+
+    }catch(e){
+        console.error(e);
+    }
+
+});
+
+ router.get('/msgpush', function (req, res, next) {
+    try{
+        //console.log(req.query,req.query.signature);
+
+        let p = req.query;
+        let signature = p.signature;
+        let timestamp = p.timestamp;
+        let nonce = p.nonce;
+
+        console.log('p=',p);
+        let very = [timestamp, nonce,"zhaogongisperfect"];
+        let data = very.sort();
+
+        console.log('data=',data);
+        let str = '';
+        for (let i = 0; i < data.length; i++) {
+            str += data[i];
+        }
+        console.log('str=',str);
+
+        let sha1 = require('sha1');
+        let verySign=sha1(str);
+        console.log('verSign=',verySign);
+        if (signature === verySign) {
+            console.log('verSign=sign');
+            res.body=req.query.echostr;
+            res.end(req.query.echostr);
+        }else{
+            console.log('verSign!=sign');
+            res.body={'msg':'valid error'};
+        }
+    }catch(e){
+        console.error(e);
+    }
+
+});
+ */
 
 module.exports = router;

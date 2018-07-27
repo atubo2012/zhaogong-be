@@ -22,8 +22,15 @@ module.exports = {
     //腾讯小程序开发者ID
     oaCfXcx: {
         appId: process.env.SI_ZG_APPID_XCX,
-        secret: process.env.SI_ZG_APPSE_XCX
+        secret: process.env.SI_ZG_APPSE_XCX,
+        access_token_timeout: 120,//access_token的有效时间，由微信公众平台指定，目前为7200秒（120分钟)
     },
+
+    // //腾讯小程序开发者ID
+    // oaCfXcx: {
+    //     OA_URL_WX_ACCESSTOKEN: process.env.OA_URL_WX_ACCESSTOKEN,
+    //     secret: process.env.SI_ZG_APPSE_XCX
+    // },
 
     //第三方OPENAPI服务集
     OA_URL_WX_CODE2SESSION: 'api.weixin.qq.com/sns/jscode2session',//https://mp.weixin.qq.com/debug/wxadoc/dev/api/signature.html
@@ -59,6 +66,7 @@ module.exports = {
         'N_UIDUPD': {desc: '工人更新档期', wechat: true, sms: true, room: '找工MP管理群'},
         'N_UIFUPD': {desc: '用户信息修改', wechat: true, sms: true, room: '找工MP管理群'},
         'N_ROCNFM': {desc: '审核通过', wechat: true, sms: true, room: '找工MP管理群'},
+
 
         //业务流程类事件
         'wait': {

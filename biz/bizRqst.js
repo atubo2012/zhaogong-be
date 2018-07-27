@@ -85,7 +85,6 @@ module.exports.list = function (req, res, err) {
         {
             cond = p;
         }
-
         log.debug('查询条件cond:' + JSON.stringify(cond));
         let MongoClient = require('mongodb').MongoClient;
         MongoClient.connect(cf.dbUrl, function (err, db) {
