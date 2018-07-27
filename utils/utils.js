@@ -168,7 +168,6 @@ let httpxReq = function (httpType,url,cb) {
             let result = iconv.decode(buff, "utf8");//转码//let result = buff.toString();//不需要转编码,直接tostring
             //l.trace(result);
             cb(result);
-
         });
     }).on("error", function (err) {
         l.error(err,'hahah');
@@ -179,6 +178,48 @@ exports.httpReq = function (url,cb) {
 };
 exports.httpsReq = function (url,cb) {
     return httpxReq('https', url,cb)
+};
+
+let httpRequest = function (httpType, options, sendData, cb) {
+    let http = require(httpType);
+    const req1 = http.request(options, (res) => {
+        l.trace(`STATUS: ${res.statusCode}`);
+        l.trace(`HEADERS: ${JSON.stringify(res.headers)}`);
+        res.setEncoding('utf8');
+        let ret = [];
+        res.on('data', (chunk) => {
+            ret.push(chunk);
+            l.trace(`BODY: ${chunk}`);
+        });
+        res.on('end', () => {
+            let result = ret.join('');
+            l.trace('result:', result);
+            cb(result);
+        });
+    });
+    req1.on('error', (e) => {
+        l.error(`httpRequest:problem with request: ${e}`);
+    });
+    req1.on('uncaughtException', (e) => {
+        l.error(`httpRequest: uncaughtException: ${e}`);
+    });
+    req1.end(sendData);
+};
+
+exports.httpRequest = function (httpType, options, sendData, cb) {
+    return httpRequest(httpType, options, sendData, cb);
+};
+
+exports.refreshAT = function () {
+    this.httpRequest('https', {
+        host: 'api.weixin.qq.com',
+        path: '/cgi-bin/token?grant_type=client_credential&appid=' + cf.appId + '&secret=' + cf.secret,
+        port: '443',
+        method: 'GET',
+    }, '', (result) => {
+        globalData['access_token'] = result;
+        l.info('access_token is updated:' + globalData.access_token);
+    })
 };
 
 
