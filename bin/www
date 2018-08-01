@@ -20,7 +20,7 @@ let schedule = require("node-schedule");
 ut.refreshAT();
 
 // API:https://www.npmjs.com/package/node-schedule
-schedule.scheduleJob('*/' + cf.oaCfXcx.access_token_timeout + ' * * * *', function () {
+schedule.scheduleJob('*/60 * * * *', function () {
     ut.refreshAT();
 });
 

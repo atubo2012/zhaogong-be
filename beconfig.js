@@ -26,12 +26,6 @@ module.exports = {
         access_token_timeout: 120,//access_token的有效时间，由微信公众平台指定，目前为7200秒（120分钟)
     },
 
-    // //腾讯小程序开发者ID
-    // oaCfXcx: {
-    //     OA_URL_WX_ACCESSTOKEN: process.env.OA_URL_WX_ACCESSTOKEN,
-    //     secret: process.env.SI_ZG_APPSE_XCX
-    // },
-
     //第三方OPENAPI服务集
     OA_URL_WX_CODE2SESSION: 'api.weixin.qq.com/sns/jscode2session',//https://mp.weixin.qq.com/debug/wxadoc/dev/api/signature.html
 

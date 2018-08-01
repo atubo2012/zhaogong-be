@@ -70,6 +70,8 @@ router.all('/wxpayquery', bizPay.payquery);//支付结果查询
 
 router.all('/msgpush', bizServMsg.msgpush);//客服信息推送。由微信服务器收到客户消息后会发送到本接口
 
+router.all('/stat-push', bizServMsg.statpush);//客服信息推送。由微信服务器收到客户消息后会发送到本接口
+
 
 router.get('/uploadrm', function (req, res, next) {
 

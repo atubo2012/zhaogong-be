@@ -43,10 +43,10 @@ let globalData = require('../globalData.js');
  */
 let log4js = require('log4js');
 log4js.configure(cf.logConfig);
-let logger = function(name){
+let logger = function (name) {
     return log4js.getLogger(name);
 };
-exports.logger=function(name){
+exports.logger = function (name) {
     return logger(name);
 };
 let l = logger('utils');    //本程序中使用的log句柄，供本文件中的函数使用。
@@ -55,37 +55,35 @@ let l = logger('utils');    //本程序中使用的log句柄，供本文件中�
 //
 
 
-
-
 /**
  * 会话有效期检查函数。
  * 当前端在每次向后端发起请求时，后端要校验session3rd是否超时，如未超时则更新ut属性，如超时则从globalData中删除该会话id对应的session记录
  * 检查是否存在session状态，并更新session的时间
  * @param session3rdKey 会话id，由后端程序生成、前端程序登录后保存在客户端本地。
  */
-let checkSession = function(session3rdKey){
+let checkSession = function (session3rdKey) {
 
     let ret = null;
-    let now  = new Date().getTime();
+    let now = new Date().getTime();
     let s = globalData.session[session3rdKey];
-    l.trace('checkSession',globalData);
+    l.trace('checkSession', globalData);
 
-    if(s){
+    if (s) {
         let then = new Date(s.ut).getTime();
-        l.trace(session3rdKey+'对应的会话存在','now',now,'then',then,'时间差',(now-then)/1000+'秒');
+        l.trace(session3rdKey + '对应的会话存在', 'now', now, 'then', then, '时间差', (now - then) / 1000 + '秒');
 
-        if((now-then)/1000>=cf.SESSION_EXPIRED){
+        if ((now - then) / 1000 >= cf.SESSION_EXPIRED) {
             l.trace('因会话超时，将删除该session!');
             delete globalData.session[session3rdKey];
             //l.trace('删除后的session:',globalData);
             ret = false;
-        }else{
+        } else {
             l.trace('会话未超时，将刷新会话内的时间!');
             globalData.session[session3rdKey].ut = new Date(now).toLocaleString();
             //l.trace('更新后的session:',globalData);
             ret = true;
         }
-    }else{
+    } else {
         ret = false;
     }
 
@@ -106,7 +104,6 @@ exports.checkSession = function (session3rdKey) {
 };
 
 
-
 /**
  * 生成随机数的，windows环境下，生成date.gettime的数字；linux下根据设备文件生成
  * @param cb
@@ -117,15 +114,15 @@ let getRandom = function (cb) {
     let exec = require('child_process').exec;
     let os = require('os');
 
-    l.trace('生成随机数的OS类别:',os.type());
+    l.trace('生成随机数的OS类别:', os.type());
 
-    if(os.type()==='Linux'){
+    if (os.type() === 'Linux') {
         cmd = 'head -n1 /dev/urandom|md5sum|head -c16';
-        exec(cmd, function(error, stdout, stderr) {
-            random =stdout;
+        exec(cmd, function (error, stdout, stderr) {
+            random = stdout;
             cb(random);
         });
-    }else{
+    } else {
         random = new Date().getTime().toString();
         cb(random);
     }
@@ -139,18 +136,17 @@ exports.getRandom = function (cb) {
 
 
 /**
- * 以http或https方式发起请求，应答结果由回调函数处理
+ * 以http或https方式发起get请求，应答结果由回调函数处理
  * @param httpType http或https
  * @param url 请求链接，https:// 之后的内容
  * @param cb 回调函数
  */
-let httpxReq = function (httpType,url,cb) {
-
+let httpxReq = function (httpType, url, cb) {
     let https = require(httpType);
     let iconv = require("iconv-lite");
 
     //l.trace('url:',url);
-    let _url=httpType+'://'+url;
+    let _url = httpType + '://' + url;
     //api.weixin.qq.com/sns/oauth2/access_token?appid="+cf.appId+"&secret="+cf.secret+"&code="+req.query.code+"&grant_type=authorization_code";
 
 
@@ -170,29 +166,42 @@ let httpxReq = function (httpType,url,cb) {
             cb(result);
         });
     }).on("error", function (err) {
-        l.error(err,'hahah');
+        l.error(err, 'hahah');
     });
 };
-exports.httpReq = function (url,cb) {
-    return httpxReq('http', url,cb)
+exports.httpReq = function (url, cb) {
+    return httpxReq('http', url, cb)
 };
-exports.httpsReq = function (url,cb) {
-    return httpxReq('https', url,cb)
+exports.httpsReq = function (url, cb) {
+    return httpxReq('https', url, cb)
 };
 
-let httpRequest = function (httpType, options, sendData, cb) {
+/**
+ * 发送http请求
+ * @param httpType
+ * @param options ：{host: 'www.baidu.com', path: '/', port: '443', method: 'GET'}
+ * @param sendData
+ * @param encode
+ * @param cb
+ */
+let httpRequest = function (httpType, options, sendData, cb, encode) {
     let http = require(httpType);
+    let iconv = require("iconv-lite");
     const req1 = http.request(options, (res) => {
+        let size = 0;
+
         l.trace(`STATUS: ${res.statusCode}`);
         l.trace(`HEADERS: ${JSON.stringify(res.headers)}`);
-        res.setEncoding('utf8');
+
         let ret = [];
         res.on('data', (chunk) => {
             ret.push(chunk);
+            size += chunk.length;
             l.trace(`BODY: ${chunk}`);
         });
         res.on('end', () => {
-            let result = ret.join('');
+            let buff = Buffer.concat(ret, size);
+            let result = iconv.decode(buff, encode ? encode : 'utf8');
             l.trace('result:', result);
             cb(result);
         });
@@ -205,11 +214,17 @@ let httpRequest = function (httpType, options, sendData, cb) {
     });
     req1.end(sendData);
 };
+// httpRequest('https',{host:'www.baidu.com' ,path:'/','port':'443',method:'GET'},'',(result)=>{
+//     l.info('httpRequesttest',result);
+// });
 
 exports.httpRequest = function (httpType, options, sendData, cb) {
     return httpRequest(httpType, options, sendData, cb);
 };
 
+/**
+ * 刷新AccessToken
+ */
 exports.refreshAT = function () {
     this.httpRequest('https', {
         host: 'api.weixin.qq.com',
@@ -217,13 +232,13 @@ exports.refreshAT = function () {
         port: '443',
         method: 'GET',
     }, '', (result) => {
-        globalData['access_token'] = result;
+        globalData['access_token'] = JSON.parse(result).access_token;
         l.info('access_token is updated:' + globalData.access_token);
     })
 };
 
 
-let fmd = function(date, style) {
+let fmd = function (date, style) {
     let y = date.getFullYear();
     let M = "0" + (date.getMonth() + 1);
     M = M.substring(M.length - 2);
@@ -239,44 +254,43 @@ let fmd = function(date, style) {
 };
 
 
-let log = function(level,levelDesc,args) {
+let log = function (level, levelDesc, args) {
     if (logLevel.LEVEL <= level) {
         let now = fmd(new Date(), 'hhmmss');
 
         //l.trace(now + '-['+levelDesc+']:========================================================');
         for (let i = 0; i < args.length; i++) {
             //若配置为前端使用的日志，则直接打印对象，便于查看。若配置为后端使用的日志，则将内容格式化后输出
-            if('front'===logLevel.TYPE){
+            if ('front' === logLevel.TYPE) {
                 l.trace(args[i]);
-            }else if('backend'===logLevel.TYPE){
-                l.trace(JSON.stringify(args[i],null,'\t'));
+            } else if ('backend' === logLevel.TYPE) {
+                l.trace(JSON.stringify(args[i], null, '\t'));
             }
         }
-        l.trace(now + '-['+levelDesc+']:==========================================================');
+        l.trace(now + '-[' + levelDesc + ']:==========================================================');
     }
 };
 let logLevel = {    //日志界别
-    FATAL:5,
-    ERROR:4,
-    WARN:3,
-    INFO:2,
-    DEBUG:1,
-    LEVEL:1, //生产环境中需要排查问题时，可以将LEVEL调低到1，正常生产情况下LEVEL应为3或2
-    TYPE:'backend' //front表示前端日志，直接输出对象；backend表示服务端日志，需要将对象转成字符串
+    FATAL: 5,
+    ERROR: 4,
+    WARN: 3,
+    INFO: 2,
+    DEBUG: 1,
+    LEVEL: 1, //生产环境中需要排查问题时，可以将LEVEL调低到1，正常生产情况下LEVEL应为3或2
+    TYPE: 'backend' //front表示前端日志，直接输出对象；backend表示服务端日志，需要将对象转成字符串
 };
 exports.error = function (desc, obj) {
-    log(logLevel.ERROR,'error',arguments);
+    log(logLevel.ERROR, 'error', arguments);
 };
 exports.warn = function (desc, obj) {
-    log(logLevel.WARN,' warn',arguments);
+    log(logLevel.WARN, ' warn', arguments);
 };
 exports.info = function (desc, obj) {
-    log(logLevel.INFO,' info',arguments);
+    log(logLevel.INFO, ' info', arguments);
 };
 exports.debug = function () {
-    log(logLevel.DEBUG,'debug',arguments);
+    log(logLevel.DEBUG, 'debug', arguments);
 };
-
 
 
 /**
@@ -302,20 +316,20 @@ let getId = function (idPrefix) {
  * @param res
  * @param err
  */
-exports.reqLog = function (req, res, err) {
-    return reqLog(req, res, err)
-};
-let reqLog = function (req, res, err) {
-    l.trace(getCc('S'));
-    l.trace('req.url:');
-    l.trace(req.url);
-    l.trace('req.query:');
-    l.trace(req.query);
-    l.trace(getCc('-'));
-    l.trace('req.body:');
-    l.trace(req.body);
-    l.trace(getCc('E'));
-};
+// exports.reqLog = function (req, res, err) {
+//     return reqLog(req, res, err)
+// };
+// let reqLog = function (req, res, err) {
+//     l.trace(getCc('S'));
+//     l.trace('req.url:');
+//     l.trace(req.url);
+//     l.trace('req.query:');
+//     l.trace(req.query);
+//     l.trace(getCc('-'));
+//     l.trace('req.body:');
+//     l.trace(req.body);
+//     l.trace(getCc('E'));
+// };
 
 /**
  * 在右方补齐空格
@@ -402,15 +416,14 @@ let prtObj = function (obj) {
  * @param str
  * @returns {boolean}
  */
-let isPoneAvailable = function(str) {
-    let myreg=/^[1][3,4,5,7,8][0-9]{9}$/;   //另一个校验规则：/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/
+let isPoneAvailable = function (str) {
+    let myreg = /^[1][3,4,5,7,8][0-9]{9}$/;   //另一个校验规则：/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/
     return myreg.test(str)
 };
-exports.isPoneAvailable  = function (str){
+exports.isPoneAvailable = function (str) {
     return isPoneAvailable(str);
 };
 // l.info('手机号码测试',isPoneAvailable('13386222037'));
-
 
 
 /**
@@ -423,11 +436,10 @@ exports.isPoneAvailable  = function (str){
  * @param phoneNumbers  接收短信的号码（文本数组），如：["17701826978", "18616257890"]
  * @param params        短信内容占位符（文本数组），如：["验证码002033", "有效期"]，params的元素个数，应与模板中的占位符数量相同，不能多也不能少。
  */
-let sendSms = function(tpltId,phoneNumbers,params) {
+let sendSms = function (tpltId, phoneNumbers, params) {
     let QcloudSms = require("qcloudsms_js");
     let appid = cf.oaCfQQSms.appid;
     let appkey = cf.oaCfQQSms.appkey;
-
 
     let qcloudsms = QcloudSms(appid, appkey);
 
@@ -443,16 +455,16 @@ let sendSms = function(tpltId,phoneNumbers,params) {
     let msender = qcloudsms.SmsMultiSender();   //多条发送的对象
     msender.sendWithParam("86", phoneNumbers, tpltId, params, "", "", "", callback);
 };
-exports.sendSms  = function (tpltId,phoneNumbers,params){
-    return sendSms(tpltId,phoneNumbers,params);
+exports.sendSms = function (tpltId, phoneNumbers, params) {
+    return sendSms(tpltId, phoneNumbers, params);
 };
 //sendSms(88752,['17701826978'],['1234','60']);
 
 
-
-let randomString = function(len) {
+let randomString = function (len) {
     len = len || 32;    //这个默认复制的方式很帅
-    let chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+    let chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
     let maxPos = chars.length;
     let pwd = '';
     for (let i = 0; i < len; i++) {
@@ -460,7 +472,7 @@ let randomString = function(len) {
     }
     return pwd.toUpperCase();
 };
-exports.randomString  = function (len){
+exports.randomString = function (len) {
     return randomString(len);
 };
 //console.log(randomString(4));

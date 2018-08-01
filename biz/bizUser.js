@@ -166,14 +166,9 @@ module.exports.edit = function (req, res, err) {
  * @param err
  */
 module.exports.addrEdit2 = function (req, res, err) {
+    log.debug(req, res, err);
     try {
-
-        ut.reqLog(req, res, err);
-
-
-        let userInfo; //用户信息
         let rdata;//业务信息
-
 
         //创建、更新
         if ('POST' === req.method) {
