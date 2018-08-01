@@ -476,14 +476,14 @@ module.exports.chck = function (req, res, err) {
                         let coll = db.collection('user');
                         let t = require('assert');
 
-                        //将手机号、role等信息设置为空，表明用户尚未注册，此处的注册表示未对手机号绑定，未确定角色。
-                        Object.assign(p, {role: ''}, {mobile: ''}, {headImage: p.avatarUrl}, {sign: ''});
+                        //将手机号设置为空，表明用户尚未注册，默认角色为CLNT，此处的注册表示未对手机号绑定。
+                        Object.assign(p, {role: 'CLNT'}, {mobile: ''}, {headImage: p.avatarUrl}, {sign: ''});
 
                         coll.updateOne(
-                            {'openId': p.openId},                   //filter
-                            {$set: p, $currentDate: {'updt': true}}, //update
-                            {upsert: true, w: 1},                   //option
-                            function (err, r) {                     //callback
+                            {'openId': p.openId},
+                            {$set: p, $currentDate: {'updt': true}},
+                            {upsert: true, w: 1},
+                            function (err, r) {
                                 t.equal(null, err);
                                 t.equal(1, r.result.n);
                                 db.close();
@@ -495,25 +495,6 @@ module.exports.chck = function (req, res, err) {
                 }
             });
 
-            //update返回一个数组，findOneAndUpdate返回一条记录。
-            // coll.findOneAndUpdate(
-            //     {"nickName": p.nickName},
-            //     p,
-            //     {upsert: true, w: 1},
-            //     function (err, r) {
-            //         t.equal(null, err);
-            //         t.equal(1, r.lastErrorObject.n);
-            //
-            //         console.log(r);
-            //         db.close();
-            //
-            //         if (r.length > 0 && r[0].role !== '') {
-            //             //将后端将数据以JSON字符串方式返回，前端以query.data获取数据。
-            //             res.send(JSON.stringify(r[0]));
-            //         } else {
-            //             res.send('0');
-            //         }
-            // });
         });
     } catch (err) {
         //TODO:所有的后台异常，都应以错误码方式反馈前台，并将异常信息国际化。

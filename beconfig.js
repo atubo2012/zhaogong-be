@@ -64,8 +64,9 @@ module.exports = {
 
         //业务流程类事件
         'wait': {
-            desc: '客户发布新订单', wechat: true, sms: true, room: '找工MP管理群', rooms: ['ZGMP开发群', '找工MP管理群'],
-            fields: ['clfn', 'sex', 'uprice', 'dura', '*addr', 'osdt', 'ostm'],
+            desc: '客户发布新订单', wechat: true, sms: true, room: '找工MP管理群',
+            rooms: ['ZGMP开发群', '找工MP管理群'],
+            fields: ['clfn', 'sex', 'uprice', 'dura', '*address', 'osdt', 'ostm'],
             words: '客户$0$1发布订单：$2元1小时，做$3小时，地点$4，上门时间$5 $6。马上打开【找工】小程序接单吧！'
         },
         'get': {desc: '工人上单', wechat: true, sms: true, room: '找工MP管理群'},

@@ -48,9 +48,37 @@ module.exports.edit = function (req, res, err) {
                     db.close();
 
                     ut.notify({data: p, type: p.stat});
-                    res.send('ok');
+                    res.send('订单号：' + p['reqId']);
                 });
+
+
         });
+
+
+        if (p.save_userinfo) {
+            log.debug('自动更新用户表1', JSON.stringify(p.save_userinfo));
+            MongoClient.connect(cf.dbUrl, function (err, db) {
+                let coll2 = db.collection('user');
+                let t = require('assert');
+                coll2.updateOne(
+                    {'openId': p.clntInfo.openId},
+                    {
+                        $set: {mobile: p.mobile},  //业务数据
+                        $currentDate: {'updt': true} //更新时间字段
+                    },
+                    {
+                        upsert: true,
+                        w: 1
+                    }, function (err, r) {
+                        log.debug('自动更新用户表2', JSON.stringify(r));
+                        t.equal(null, err);
+                        db.close();
+
+                        //ut.notify({data: p, type: p.stat});
+                        //res.send('ok');
+                    });
+            });
+        }
     } catch (err) {
         log.error(err);
     }

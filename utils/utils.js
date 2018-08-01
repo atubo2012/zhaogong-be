@@ -226,15 +226,17 @@ exports.httpRequest = function (httpType, options, sendData, cb) {
  * 刷新AccessToken
  */
 exports.refreshAT = function () {
-    this.httpRequest('https', {
-        host: 'api.weixin.qq.com',
-        path: '/cgi-bin/token?grant_type=client_credential&appid=' + cf.appId + '&secret=' + cf.secret,
-        port: '443',
-        method: 'GET',
-    }, '', (result) => {
-        globalData['access_token'] = JSON.parse(result).access_token;
-        l.info('access_token is updated:' + globalData.access_token);
-    })
+    if (process.env.SI_ZG_ACCESS_TOKEN === 'true') {
+        this.httpRequest('https', {
+            host: 'api.weixin.qq.com',
+            path: '/cgi-bin/token?grant_type=client_credential&appid=' + cf.appId + '&secret=' + cf.secret,
+            port: '443',
+            method: 'GET',
+        }, '', (result) => {
+            globalData['access_token'] = JSON.parse(result).access_token;
+            l.info('access_token is updated:' + globalData.access_token);
+        })
+    }
 };
 
 
