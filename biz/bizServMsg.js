@@ -32,7 +32,6 @@ module.exports.statpush = function (req, res, err) {
     } catch (e) {
         log.error(e);
     }
-
 };
 
 /**

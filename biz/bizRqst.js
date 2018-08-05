@@ -48,10 +48,8 @@ module.exports.edit = function (req, res, err) {
                     db.close();
 
                     ut.notify({data: p, type: p.stat});
-                    res.send('订单号：' + p['reqId']);
+                    res.send(p['reqId']);
                 });
-
-
         });
 
 
