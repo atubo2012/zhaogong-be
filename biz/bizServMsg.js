@@ -80,7 +80,7 @@ module.exports.msgpush = function (req, res, err) {
             method: 'POST',
         };
 
-        ut.httpRequest('https', options, postData2, (result) => {
+        ut.httpRequest('https', options, postData, (result) => {
             log.debug('客服消息推送应答', result)
         });
     } catch (e) {

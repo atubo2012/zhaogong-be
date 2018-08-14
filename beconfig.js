@@ -79,17 +79,47 @@ module.exports = {
         'lbor-cancel': {desc: '工人取消', wechat: true, sms: true, room: '找工MP管理群'},
         'clnt-cancel': {desc: '客户取消', wechat: true, sms: true, room: '找工MP管理群'},
 
-        'bs_wait': {
+        bs_wait: {
             desc: '【新订单】', wechat: true, sms: true, room: '找工MP管理群',
             rooms: ['ZGMP开发群', '找工MP管理群'],
             fields: ['clfn', 'biz_type', 'mobile'],
             words: '客户【$0】【$2】发布【$1】订单。马上打开【找工】小程序接单吧！'
         },
-        'bs_paid': {
+        bs_paid: {
             desc: '【订单付款】', wechat: true, sms: true, room: '找工MP管理群',
             rooms: ['ZGMP开发群', '找工MP管理群'],
             fields: ['out_trade_no'],
             words: '订单【$0】已付款，请尽快联系客户确认服务内容。'
+        },
+        bs_delivered: {
+            desc: '【开始配送】', wechat: true, sms: true, room: '找工MP管理群',
+            rooms: ['ZGMP开发群', '找工MP管理群'],
+            fields: ['reqId'],
+            words: '订单【$0】。'
+        },
+        bs_received_f: {
+            desc: '【买家收货】', wechat: true, sms: true, room: '找工MP管理群',
+            rooms: ['ZGMP开发群', '找工MP管理群'],
+            fields: ['reqId'],
+            words: '订单【$0】'
+        },
+        bs_returning: {
+            desc: '【买家退货】', wechat: true, sms: true, room: '找工MP管理群',
+            rooms: ['ZGMP开发群', '找工MP管理群'],
+            fields: ['reqId'],
+            words: '订单【$0】'
+        },
+        bs_returned: {
+            desc: '【卖家收到退货】', wechat: true, sms: true, room: '找工MP管理群',
+            rooms: ['ZGMP开发群', '找工MP管理群'],
+            fields: ['reqId'],
+            words: '订单【$0】'
+        },
+        bs_unpaid_f: {
+            desc: '【卖家已退款】', wechat: true, sms: true, room: '找工MP管理群',
+            rooms: ['ZGMP开发群', '找工MP管理群'],
+            fields: ['reqId'],
+            words: '订单【$0】'
         },
 
 
