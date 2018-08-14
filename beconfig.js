@@ -69,7 +69,7 @@ module.exports = {
             fields: ['clfn', 'sex', 'uprice', 'dura', '*address', 'osdt', 'ostm'],
             words: '客户$0$1发布订单：$2元1小时，做$3小时，地点$4，上门时间$5 $6。马上打开【找工】小程序接单吧！'
         },
-        'get': {desc: '工人上单', wechat: true, sms: true, room: '找工MP管理群'},
+        'get': {desc: '工人接单', wechat: true, sms: true, room: '找工MP管理群'},
         'start': {desc: '工人开工', wechat: true, sms: true, room: '找工MP管理群'},
         'finish': {desc: '工人完工', wechat: true, sms: true, room: '找工MP管理群'},
         'close': {desc: '客户关闭订单', wechat: false, room: '找工MP管理群'},
@@ -78,6 +78,20 @@ module.exports = {
         'ccmmt': {desc: '客户点评', wechat: true, sms: true, room: '找工MP管理群'},
         'lbor-cancel': {desc: '工人取消', wechat: true, sms: true, room: '找工MP管理群'},
         'clnt-cancel': {desc: '客户取消', wechat: true, sms: true, room: '找工MP管理群'},
+
+        'bs_wait': {
+            desc: '【新订单】', wechat: true, sms: true, room: '找工MP管理群',
+            rooms: ['ZGMP开发群', '找工MP管理群'],
+            fields: ['clfn', 'biz_type', 'mobile'],
+            words: '客户【$0】【$2】发布【$1】订单。马上打开【找工】小程序接单吧！'
+        },
+        'bs_paid': {
+            desc: '【订单付款】', wechat: true, sms: true, room: '找工MP管理群',
+            rooms: ['ZGMP开发群', '找工MP管理群'],
+            fields: ['out_trade_no'],
+            words: '订单【$0】已付款，请尽快联系客户确认服务内容。'
+        },
+
 
         //系统类事件
         'N_SUEXPT': {desc: '未知异常发生', wechat: true, sms: true, room: '找工MP管理群'},

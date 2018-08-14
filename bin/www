@@ -65,7 +65,7 @@ emt.on('notify', (argsObject) => {
             nRules.rooms.forEach((item, index, arr) => {
                 setTimeout(() => {
                     currentRule.room = item;
-                    log.debug('send to rooms2', {data: notifyContent, rule: {room: item, desc: nRules.desc}});
+                    //log.debug('send to rooms2', {data: notifyContent, rule: {room: item, desc: nRules.desc}});
                     let data = ut.getSpeakSpec(notifyContent, nRules.fields, nRules.words);
                     global.socket.emit('event', {data: data, rule: {room: item, desc: nRules.desc}})
                     //global.socket.emit('event', {data: notifyContent, rule: {room:item,desc:nRules.desc}})

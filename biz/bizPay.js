@@ -94,7 +94,7 @@ module.exports.payquery = function (req1, res1, err) {
                                 'total_fee': resultObj.total_fee,
                                 'transaction_id': resultObj.transaction_id,
                                 'trade_state': resultObj.trade_state,
-                                'stat': 'paid'
+                                'stat': param.paystat //前端传来的支付状态
                             };
 
                             let MongoClient = require('mongodb').MongoClient;
@@ -107,6 +107,12 @@ module.exports.payquery = function (req1, res1, err) {
                                         t.equal(null, err);
                                         t.equal(1, r.result.n);
                                         db.close();
+
+                                        //参考订单更新的处理逻辑
+                                        ut.notify({
+                                            data: Object.assign(updatedField, {'out_trade_no': out_trade_no}),
+                                            type: param.paystat
+                                        });
                                         res1.end(JSON.stringify({msg: resultObj.return_msg, status: '100'}));
                                     });
                             });
