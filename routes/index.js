@@ -12,6 +12,7 @@ let bizRqst = require('../biz/bizRqst.js');
 let bizCmmt = require('../biz/bizCmmt.js');
 let bizPay = require('../biz/bizPay.js');
 let bizServMsg = require('../biz/bizServMsg.js');
+let bizTomato = require('../biz/bizTomato.js');
 
 
 /* GET home page. 验证express框架是否就绪的web页面*/
@@ -54,6 +55,9 @@ router.get('/login2', bizUser.login2);//登录获取用户的openid
 router.get('/user-chck', bizUser.chck);//用户检查
 router.get('/user-edit', bizUser.edit);//用户注册和信息修改
 router.get('/user-list', bizUser.list);//用户注册和信息修改
+
+router.get('/tomato-edit', bizTomato.edit);
+router.get('/tomato-list', bizTomato.list);
 
 router.get('/user-mbck', bizUser.mbck);//手机号唯一性检查
 router.get('/user-mbsc', bizUser.mbsc);//获取动态码
