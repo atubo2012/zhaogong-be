@@ -29,7 +29,7 @@ module.exports = {
     //第三方OPENAPI服务集
     OA_URL_WX_CODE2SESSION: 'api.weixin.qq.com/sns/jscode2session',//https://mp.weixin.qq.com/debug/wxadoc/dev/api/signature.html
 
-    SESSION_EXPIRED: 30 * 60,//会话有效期（60表示秒）
+    SESSION_EXPIRED: 120 * 60,//会话有效期120分钟（60表示秒）
 
     //log4js的配置
     logConfig: {
