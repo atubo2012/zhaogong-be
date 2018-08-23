@@ -49,7 +49,7 @@ module.exports.msgpush = function (req, res, err) {
         const postData = JSON.stringify({
             "touser": req.body.FromUserName,
             "msgtype": "text",
-            "text": {"content": "您好，客服微信号为：wanxinsh2017,也可以扫描以下二维码与客服联系！"}
+            "text": {"content": "您好，欢迎您！"}
         });
 
         //如希望发送图片消息，则在req.end()方法中使用postData
