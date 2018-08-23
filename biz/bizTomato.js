@@ -35,7 +35,7 @@ module.exports.edit = function (req, res, err) {
                 {'openId': openId},
                 {
                     $set: {nickName: p.nickName},  //业务数据
-                    $push: {tomatos: {$each: [p.tomato], $position: 0}},
+                    $push: {tomatos: {$each: [p.tomato], $position: 0}}, //用$each和$position关键字将数据插入第一个元素。
                     $currentDate: {'updt': true} //更新时间字段
                 },
                 {upsert: true, w: 1}, function (err, r) {
@@ -74,6 +74,7 @@ module.exports.list = function (req, res, err) {
 
             let coll = db.collection('tomato');
 
+            //流程：定位记录->用$slice操作符截取数组中的数据->取得结果集中的第一个元素->应答给前端
             coll.find(cond.query, {tomatos: {$slice: [cond.skip, cond.limit]}}).sort({'updt': -1}).toArray(function (err, docs) {
                 log.debug(docs);
 

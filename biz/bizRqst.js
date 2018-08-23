@@ -94,7 +94,7 @@ module.exports.list = function (req, res, err) {
 
     let p = req.query;
 
-    log.debug('需求单list，前端传入的参数：',p);
+    log.debug('需求单list，前端传入的参数：', p, typeof(p));
 
     try {
 
@@ -104,20 +104,25 @@ module.exports.list = function (req, res, err) {
         //如果请求中有reqId，则按照reqId查询单条
         if (typeof(p.reqId) !== 'undefined') {
             log.debug('按照reqId查询：' + p.reqId);
-            cond['reqId'] = p.reqId;
+            cond['query'] = {'reqId': p.reqId};
+            cond['skip'] = 0;
+            cond['limit'] = 1;
 
             //TODO:如果是单条查询，则在应答中增加评价记录，便于展现和隐藏“评价按钮”
         }else
         {
-            cond = p;
+            cond = JSON.parse(p.cond);
         }
-        log.debug('查询条件cond:' + JSON.stringify(cond));
+        log.debug('查询条件cond:', cond, typeof(cond), typeof(cond.skip));
+
+
         let MongoClient = require('mongodb').MongoClient;
         MongoClient.connect(cf.dbUrl, function (err, db) {
 
             let coll = db.collection('rqst');
 
-            coll.find( Object.assign(cond )).sort({'updt':-1}).toArray(function (err, docs) {
+            coll.find(cond.query).sort({'updt': -1}).skip(cond.skip).limit(cond.limit).toArray(function (err, docs) {
+                console.info(err, docs);
                 res.send(JSON.stringify(docs)); //将后端将数据以JSON字符串方式返回，前端以query.data获取数据。
                 db.close();
             });
