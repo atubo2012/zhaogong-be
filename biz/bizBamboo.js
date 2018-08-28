@@ -29,7 +29,7 @@ module.exports.list = function (req, res, err) {
             //log.debug('coll',coll);
             //流程：定位记录->用$slice操作符截取数组中的数据->取得结果集中的第一个元素->应答给前端
             coll.find(cond.query).sort(cond.sort).skip(cond.skip).limit(cond.limit).toArray(function (err, docs) {
-                log.debug(docs);
+                //log.debug(docs);
 
                 if (docs && docs.length === 0)
                     res.send('no');
