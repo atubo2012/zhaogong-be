@@ -123,7 +123,7 @@ module.exports.list = function (req, res, err) {
 
 
             coll.find(cond.query).sort({'updt': -1}).skip(cond.skip).limit(cond.limit).toArray(function (err, docs) {
-                console.info(err, docs.length);
+                //console.info(err, docs.length);
                 res.send(JSON.stringify(docs)); //将后端将数据以JSON字符串方式返回，前端以query.data获取数据。
                 db.close();
             });

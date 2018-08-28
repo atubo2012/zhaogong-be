@@ -8,6 +8,7 @@ module.exports = {
 
     //数据库参数
     dbUrl: 'mongodb://' + process.env.SI_ZG_DBURL,
+    dbUrlBb: 'mongodb://' + process.env.SI_BB_DBURL,
 
     //找工小程序的保密信息
     appId: process.env.SI_ZG_APPID_XCX,                 //小程序的appid
