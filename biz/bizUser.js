@@ -125,10 +125,15 @@ module.exports.edit = function (req, res, err) {
 
     //前后台之间用rdata作为参数名，rdata意为remote data，即远程数据。
     let p = JSON.parse(req.query.rdata);
-
     log.debug('将更新的用户信息', p);
-    try {
 
+
+    //更新用户信息前，检查是否uid字段存在，若不存在，则补充生成。
+    if (!p.uid || '' === p.uid) {
+        p['uid'] = ut.getId('U');
+        log.debug('uid尚未生成，生成新的uid为：' + p['uid']);
+    }
+    try {
 
         let MongoClient = require('mongodb').MongoClient;
 
@@ -348,7 +353,7 @@ module.exports.list = function (req, res, err) {
             let coll = db.collection('user');
 
             coll.find(cond.query).sort({'updt': -1}).skip(cond.skip).limit(cond.limit).toArray(function (err, docs) {
-                log.debug(docs);
+                //log.debug(docs);
                 res.send(JSON.stringify(docs)); //将后端将数据以JSON字符串方式返回，前端以query.data获取数据。
                 db.close();
             });
@@ -432,7 +437,8 @@ module.exports.login2 = function (req, res2, err) {
  */
 module.exports.chck = function (req, res, err) {
     let p = JSON.parse(req.query.userInfo);
-    log.debug('校验用户是否为新用户,收到参数', p);
+    let runmode = req.query.runmode;
+    log.debug('校验用户是否为新用户,收到参数', req.query, req.body, req.params);
 
 
     let MongoClient = require('mongodb').MongoClient;
@@ -475,22 +481,35 @@ module.exports.chck = function (req, res, err) {
                     MongoClient.connect(cf.dbUrl, function (err, db) {
                         let coll = db.collection('user');
                         let t = require('assert');
+                        let uid = ut.getId('U');//生成uid
 
-                        //将手机号设置为空，表明用户尚未注册，默认角色为CLNT，此处的注册表示未对手机号绑定。
-                        Object.assign(p, {role: 'CLNT'}, {mobile: ''}, {headImage: p.avatarUrl}, {sign: ''});
+                        //生成营销二维码
+                        ut.genQrCode({
+                            page: 'pages/index/index',
+                            scene: 'A&' + uid + '&&' + runmode,
+                        }, uid, (file_name) => {
+                            //log.info('genQrCode0000000000000000000000000000000:', uid, file_name);
 
-                        coll.updateOne(
-                            {'openId': p.openId},
-                            {$set: p, $currentDate: {'updt': true}},
-                            {upsert: true, w: 1},
-                            function (err, r) {
-                                t.equal(null, err);
-                                t.equal(1, r.result.n);
-                                db.close();
 
-                                ut.notify({data: p, type: 'N_UNEWUS'});
-                                res.send(JSON.stringify(p));
-                            });
+                            //将手机号设置为空，表明用户尚未注册，默认角色为CLNT，此处的注册表示未对手机号绑定。
+                            //将营销二维码和uid补充到userInfo中
+                            Object.assign(p, {role: 'CLNT'}, {mobile: ''}, {uid: uid}, {qrcode: file_name}, {headImage: p.avatarUrl}, {sign: ''});
+
+                            coll.updateOne(
+                                {'openId': p.openId},
+                                {$set: p, $currentDate: {'updt': true}},
+                                {upsert: true, w: 1},
+                                function (err, r) {
+                                    t.equal(null, err);
+                                    t.equal(1, r.result.n);
+                                    db.close();
+
+                                    runmode !== 'dev' ? ut.notify({data: p, type: 'N_UNEWUS'}) : '';
+                                    res.send(JSON.stringify(p));
+                                });
+                        });
+
+
                     });
                 }
             });

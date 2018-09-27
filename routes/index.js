@@ -1,6 +1,7 @@
 let express = require('express');
 let router = express.Router();
 
+let globalData = require('../globalData.js');
 let cf = require('../beconfig.js');
 let ut = require('../utils/utils.js');
 let log = ut.logger(__filename);
@@ -79,6 +80,7 @@ router.all('/msgpush', bizServMsg.msgpush);//客服信息推送。由微信服�
 router.all('/stat-push', bizServMsg.statpush);//客服信息推送。由微信服务器收到客户消息后会发送到本接口
 
 
+
 router.get('/uploadrm', function (req, res, next) {
 
     let rmfile = JSON.parse(req.query.rdata).rmfile;
@@ -106,110 +108,77 @@ router.post('/upload',uploadtutil.single('avatar'),function(req,res,next){
 });
 
 /**
- router.post('/msgpush', function (req, res, next) {
-    try{
-            console.log(req.query,req.params,req.body);
-            res.send('success');
-            let http = require('https');
+ * 生成二维码服务
+ * 参考：
+ * （1）官方文档：https://developers.weixin.qq.com/miniprogram/dev/api/qrcode.html
+ * （2）非官案例：
+ *      https://blog.csdn.net/fz250052/article/details/80380355
+ *      https://blog.csdn.net/yemuxia_sinian/article/details/81981164
+ */
+router.get('/gen-qrcode2', function (req, res, next) {
+    let rdata = JSON.parse(req.query.rdata);
+    log.info('qrcode rp:', rdata);
 
-            const postData = JSON.stringify({
-                "touser":req.body.FromUserName,
-                "msgtype":"text",
-                "text":
-                    {
-                        "content":"Hello World"
-                    }
-            });
-            const options = {
-                host: 'api.weixin.qq.com',
-                port: '443',
-                path: '/cgi-bin/message/custom/send?access_token=zhaogongisperfect',
-                method: 'POST',
-            };
+    try {
+        if (rdata.scene.length > 32) {
+            throw 'scene参数的长度超出了最大限制32个字符。';
+        }
+        let body = {
+            page: rdata.page,//二维码默认打开小程序页面
+            scene: rdata.scene,//打开页面时携带的参数
+            width: rdata.width,
+            auto_color: rdata.auto_color,
+        };
+        log.info('qrcode body rp:', body);
 
-
-        const tokenOptions = {
+        ut.httpRequest4Qrcode('https', {
             host: 'api.weixin.qq.com',
+            path: '/wxa/getwxacodeunlimit?access_token=' + globalData.access_token,
             port: '443',
-            path: '/api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='+cf.appId+'&secret='+cf.secret,
-            method: 'GET',
+            method: 'POST'
+        }, JSON.stringify(body), (result) => {
+
+            //后缀4位随机数，以区分A、B、C三类场景
+            //let file_name = 'qrcode_'+rdata.userInfo.uid+'_'+ut.randomString(4)+'.png';
+            let file_name = 'qrcode_' + body.scene.replace(/&/g, '_') + '.png';//文件名根据scene中的值来命名，便于识别
+            let file_name_with_path = process.env.SI_ZG_UPLOAD_DIR + 'upload/' + file_name;
+            log.info('/gen-qrcode :' + file_name, file_name_with_path);
+
+            let fs = require('fs');
+            fs.writeFileSync(file_name_with_path, result);
+            res.end(file_name);
+        });
+
+    } catch (e) {
+        log.error(e);
+        res.end('error gen-qrcode');
+    }
+});
+
+router.get('/gen-qrcode', function (req, res, next) {
+    let rdata = JSON.parse(req.query.rdata);
+    log.info('qrcode rp:', rdata);
+
+    try {
+        if (rdata.scene.length > 32) {
+            throw 'scene参数的长度超出了最大限制32个字符。';
+        }
+        let body = {
+            page: rdata.page,//二维码默认打开小程序页面
+            scene: rdata.scene,//打开页面时携带的参数
+            width: rdata.width,
+            auto_color: rdata.auto_color,
         };
 
-        let ret0 = [];
-        const req0 = http.request(tokenOptions,(res0)=>{
-            res0.on('data', (chunk) => {
-                ret0.push(chunk);
-                console.log(`token BODY: ${chunk}`);
-            });
-            res0.on('end', () => {
-                console.log('result:',Buffer.concat(ret0));
-                console.log('No more data in response.');
-            });
+        ut.genQrCode(body, rdata.userInfo.uid, (file_name) => {
+            res.end(file_name);
         });
 
 
-        const req1 = http.request(options, (res) => {
-            console.log(`STATUS: ${res.statusCode}`);
-            console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
-            res.setEncoding('utf8');
-            let ret = [];
-            res.on('data', (chunk) => {
-                ret.push(chunk);
-                console.log(`BODY: ${chunk}`);
-            });
-            res.on('end', () => {
-                console.log('result:',Buffer.concat(ret));
-                console.log('No more data in response.');
-            });
-        });
-        req1.on('error', (e) => {
-            console.log(`problem with request: ${e.message}`);
-        });
-        req1.write(postData);
-        req1.end();
-
-    }catch(e){
-        console.error(e);
+    } catch (e) {
+        log.error(e);
+        res.end('error gen-qrcode');
     }
-
 });
-
- router.get('/msgpush', function (req, res, next) {
-    try{
-        //console.log(req.query,req.query.signature);
-
-        let p = req.query;
-        let signature = p.signature;
-        let timestamp = p.timestamp;
-        let nonce = p.nonce;
-
-        console.log('p=',p);
-        let very = [timestamp, nonce,"zhaogongisperfect"];
-        let data = very.sort();
-
-        console.log('data=',data);
-        let str = '';
-        for (let i = 0; i < data.length; i++) {
-            str += data[i];
-        }
-        console.log('str=',str);
-
-        let sha1 = require('sha1');
-        let verySign=sha1(str);
-        console.log('verSign=',verySign);
-        if (signature === verySign) {
-            console.log('verSign=sign');
-            res.body=req.query.echostr;
-            res.end(req.query.echostr);
-        }else{
-            console.log('verSign!=sign');
-            res.body={'msg':'valid error'};
-        }
-    }catch(e){
-        console.error(e);
-    }
-
-});
- */
 
 module.exports = router;

@@ -34,6 +34,7 @@
  */
 let cf = require('../beconfig.js');
 let globalData = require('../globalData.js');
+let fs = require('fs');
 
 
 /**
@@ -135,6 +136,23 @@ exports.getRandom = function (cb) {
 // });
 
 
+let randomString = function (len) {
+    len = len || 32;    //这个默认复制的方式很帅
+    let chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
+    let maxPos = chars.length;
+    let pwd = '';
+    for (let i = 0; i < len; i++) {
+        pwd += chars.charAt(Math.floor(Math.random() * maxPos));
+    }
+    return pwd.toUpperCase();
+};
+exports.randomString = function (len) {
+    return randomString(len);
+};
+//console.log(randomString(4));
+
+
 /**
  * 以http或https方式发起get请求，应答结果由回调函数处理
  * @param httpType http或https
@@ -177,7 +195,7 @@ exports.httpsReq = function (url, cb) {
 };
 
 /**
- * 发送http请求
+ * httpReq的升级版，支持对应答字符集指定转码规则
  * @param httpType
  * @param options ：{host: 'www.baidu.com', path: '/', port: '443', method: 'GET'}
  * @param sendData
@@ -223,6 +241,46 @@ exports.httpRequest = function (httpType, options, sendData, cb) {
 };
 
 /**
+ * 生成二维码专用的请求，不对应答进行字符集转码，处理流程通
+ * @param httpType
+ * @param options
+ * @param sendData
+ * @param cb
+ */
+let httpRequest4Qrcode = function (httpType, options, sendData, cb) {
+    let http = require(httpType);
+    const req1 = http.request(options, (res) => {
+        let size = 0;
+
+        l.trace(`STATUS: ${res.statusCode}`);
+        l.trace(`HEADERS: ${JSON.stringify(res.headers)}`);
+
+        let ret = [];
+        res.on('data', (chunk) => {
+            ret.push(chunk);
+            size += chunk.length;
+            l.trace(`BODY: ${chunk}`);
+        });
+        res.on('end', () => {
+            let result = Buffer.concat(ret, size);
+            l.trace('result:', result);
+            cb(result);
+        });
+    });
+    req1.on('error', (e) => {
+        l.error(`httpRequest:problem with request: ${e}`);
+    });
+    req1.on('uncaughtException', (e) => {
+        l.error(`httpRequest: uncaughtException: ${e}`);
+    });
+    req1.end(sendData);
+};
+
+exports.httpRequest4Qrcode = function (httpType, options, sendData, cb) {
+    httpRequest4Qrcode(httpType, options, sendData, cb);
+};
+
+/**
  * 刷新AccessToken
  */
 exports.refreshAT = function () {
@@ -237,6 +295,43 @@ exports.refreshAT = function () {
             l.info('access_token is updated:' + globalData.access_token);
         })
     }
+};
+
+/**
+ *
+ *
+ */
+/**
+ * 功能：获取小程序码
+ * 场景：
+ * 1、生成用户引流用户的MP码。如：新用户创建时静默生成MP码，bizUser.chck()，bizUser.edit()
+ * 2、生成用户引流商品购买的MP码。如：用户在下单界面中点击生成与本人相关的营销MP码
+ *
+ * @param body 对象类型的参数 ，参数内容参考官文：https://developers.weixin.qq.com/miniprogram/dev/api/open-api/qr-code/getWXACodeUnlimit.html
+ * @param uid  MP码对应的用户的uid，通常由cc_dop.wxml被引用时传入
+ * @param cb   以MP码的文件名file_name为参数的回调函数
+ */
+let genQrCode = function (body, uid, cb) {
+
+    l.info('genCode=================', body, uid);
+    httpRequest4Qrcode('https', {
+        host: 'api.weixin.qq.com',
+        path: '/wxa/getwxacodeunlimit?access_token=' + globalData.access_token,
+        port: '443',
+        method: 'POST'
+    }, JSON.stringify(body), (result) => {
+        l.debug('ut.genQrCode', result);
+
+        let file_name = 'qrcode_' + body.scene.replace(/&/g, '_') + '.png';//文件名根据scene中的值来命名，便于识别
+        let file_name_with_path = process.env.SI_ZG_UPLOAD_DIR + 'upload/' + file_name;
+        fs.writeFileSync(file_name_with_path, result);
+        l.info('ut.genQrCode', file_name_with_path);
+
+        cb && cb(file_name);
+    });
+};
+exports.genQrCode = function (body, uid, cb) {
+    genQrCode(body, uid, cb);
 };
 
 
@@ -298,18 +393,56 @@ exports.debug = function () {
 /**
  * 根据时间戳生成ID序号。适合并发量较小的应用使用。
  * 针对并发量较大的场景，可以考虑使用数据库的自增字段获得ID。
- * @param idPrefix  业务实体的前缀，建议用四位字母。如需求单可以使用RQST
+ * @param  idPrefix  业务实体的前缀，建议用四位字母。如需求单可以使用RQST
+ * @param  rslength  后缀随机及字符串
  */
-exports.getId = function (idPrefix) {
-    return getId(idPrefix)
+// exports.getId = function (idPrefix) {
+//     return getId(idPrefix)
+// };
+// let getId = function (idPrefix) {
+//     let ts = (new Date().getTime()).toFixed(0) + '-' + randomString(4);
+//     return idPrefix + ts;
+// };
+
+exports.getId = function (idPrefix, rslength) {
+    return getId(idPrefix, rslength)
 };
-let getId = function (idPrefix) {
-    let ts = (new Date().getTime()).toFixed(0) + '-' + randomString('4');
-    return idPrefix + ts;
+let getId = function (idPrefix, rslength) {
+    let postFix = rslength ? randomString(rslength) : '';
+    //console.log(postFix);
+    let ts = (new Date().getTime()).toFixed(0);
+    return (idPrefix || '') + ts + postFix;
 };
 
-// let id = getId('A');
-// l.trace(id);
+//l.info(getId(),getId('Aaa'),getId('A',1),getId('A',3));
+
+// exports.getQrCode = function (rdata) {
+//
+//     let body = JSON.stringify({
+//         page: rdata.page,//二维码默认打开小程序页面
+//         scene: rdata.scene,//打开页面时携带的参数
+//         width: rdata.width,
+//         auto_color: rdata.auto_color,
+//     });
+//     l.info('ut.getQrCode rp:', body);
+//
+//     httpRequest4Qrcode('https', {
+//         host: 'api.weixin.qq.com',
+//         path: '/wxa/getwxacodeunlimit?access_token=' + globalData.access_token,
+//         port: '443',
+//         method: 'POST'
+//     }, body, (result) => {
+//
+//         //后缀4位随机数，以区分A、B、C三类场景
+//         let file_name = 'qrcode_'+rdata.userInfo.uid+'_'+ut.randomString(4)+'.png';
+//         let file_name_with_path = process.env.SI_ZG_UPLOAD_DIR + 'upload/'+file_name;
+//         log.info('getQrCode():' + file_name,file_name_with_path);
+//
+//         let fs = require('fs');
+//         fs.writeFileSync(file_name_with_path, result);
+//         res.end(file_name);
+//     });
+// };
 
 
 /**
@@ -463,21 +596,6 @@ exports.sendSms = function (tpltId, phoneNumbers, params) {
 //sendSms(88752,['17701826978'],['1234','60']);
 
 
-let randomString = function (len) {
-    len = len || 32;    //这个默认复制的方式很帅
-    let chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
-    /****默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1****/
-    let maxPos = chars.length;
-    let pwd = '';
-    for (let i = 0; i < len; i++) {
-        pwd += chars.charAt(Math.floor(Math.random() * maxPos));
-    }
-    return pwd.toUpperCase();
-};
-exports.randomString = function (len) {
-    return randomString(len);
-};
-//console.log(randomString(4));
 
 /**
  * 向指定的ws服务器发送event事件。此函数因为没有关闭，所以会保持连接，仅作为验证，尚未在zg应用中使用
