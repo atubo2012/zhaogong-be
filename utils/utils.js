@@ -268,10 +268,10 @@ let httpRequest4Qrcode = function (httpType, options, sendData, cb) {
         });
     });
     req1.on('error', (e) => {
-        l.error(`httpRequest:problem with request: ${e}`);
+        l.error(`httpRequest4Qrcode:problem with request: ${e}`);
     });
     req1.on('uncaughtException', (e) => {
-        l.error(`httpRequest: uncaughtException: ${e}`);
+        l.error(`httpRequest4Qrcode: uncaughtException: ${e}`);
     });
     req1.end(sendData);
 };
@@ -389,32 +389,62 @@ exports.debug = function () {
     log(logLevel.DEBUG, 'debug', arguments);
 };
 
+let splitStr2Arr = function (str, len) {
+    let ret = [];
+    let yu = str.length % len;
+    let mod = Math.floor(str.length / len);
+
+    console.log('yu', yu, 'mod', mod);
+
+    for (let i = 0; i < mod; i++) {
+
+        let from = i * len;
+        let to = i * len + len;
+        console.log('from', from, 'to', to);
+        let currentItem = str.substring(from, to);
+        ret.push(currentItem)
+    }
+
+    if (yu > 0)
+        ret.push(str.substring(len * mod, str.length));
+
+    return ret;
+};
+console.log(splitStr2Arr('天气再凉，冷却不了我对您的思念重重，距离再远，相隔不断我对您的关心重重。重阳节快到了，送一份温暖，健康永远！', 18));
+
+
+exports.getId32 = function (idPrefix, rslength) {
+    return getId32(idPrefix, rslength)
+};
+let getId32 = function (idPrefix, rslength) {
+    return getId(idPrefix, rslength, 32)
+};
+
+exports.getId = function (idPrefix, rslength, jinzhi) {
+    return getId(idPrefix, rslength, jinzhi)
+};
 
 /**
- * 根据时间戳生成ID序号。适合并发量较小的应用使用。
- * 针对并发量较大的场景，可以考虑使用数据库的自增字段获得ID。
- * @param  idPrefix  业务实体的前缀，建议用四位字母。如需求单可以使用RQST
- * @param  rslength  后缀随机及字符串
+ * 生成ID
+ * @param idPrefix，id前缀，默认无前缀，
+ * @param rslength，随机生成后缀的长度
+ * @param jinzhi，表示进制的数字，如32,16,8
+ * @returns {string}
  */
-// exports.getId = function (idPrefix) {
-//     return getId(idPrefix)
-// };
-// let getId = function (idPrefix) {
-//     let ts = (new Date().getTime()).toFixed(0) + '-' + randomString(4);
-//     return idPrefix + ts;
-// };
-
-exports.getId = function (idPrefix, rslength) {
-    return getId(idPrefix, rslength)
-};
-let getId = function (idPrefix, rslength) {
-    let postFix = rslength ? randomString(rslength) : '';
+let getId = function (idPrefix, rslength, jinzhi) {
     //console.log(postFix);
-    let ts = (new Date().getTime()).toFixed(0);
+    let ts = parseInt((new Date().getTime()).toFixed(0));
+
+    let postFix = rslength ? randomString(rslength) : '';
+
+    if (jinzhi || 10) {
+        ts = ts.toString(jinzhi).toUpperCase();
+    }
     return (idPrefix || '') + ts + postFix;
+
 };
 
-//l.info(getId(),getId('Aaa'),getId('A',1),getId('A',3));
+l.info(getId(), getId('Aaa'), getId('A', 1), getId('A', 3), getId('U-', 1, 32), getId32('A-', 1));
 
 // exports.getQrCode = function (rdata) {
 //
