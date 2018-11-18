@@ -15,6 +15,7 @@ let bizPay = require('../biz/bizPay.js');
 let bizServMsg = require('../biz/bizServMsg.js');
 let bizTomato = require('../biz/bizTomato.js');
 let bizBamboo = require('../biz/bizBamboo.js');
+let bizMgmt = require('../biz/bizMgmt.js');
 
 
 /* GET home page. 验证express框架是否就绪的web页面*/
@@ -78,6 +79,10 @@ router.all('/wxpayquery', bizPay.payquery);//支付结果查询
 router.all('/msgpush', bizServMsg.msgpush);//客服信息推送。由微信服务器收到客户消息后会发送到本接口
 
 router.all('/stat-push', bizServMsg.statpush);//客服信息推送。由微信服务器收到客户消息后会发送到本接口
+
+router.all('/biz-edit', bizMgmt.edit);//业务类别管理
+router.all('/biz-list', bizMgmt.list);//业务类别查询
+router.all('/bizcatalog-list', bizMgmt.bizcataloglist);//业务种类清单，客户查询清单时展示
 
 
 
@@ -169,7 +174,6 @@ router.get('/gen-qrcode', function (req, res, next) {
             width: rdata.width,
             auto_color: rdata.auto_color,
         };
-
         ut.genQrCode(body, rdata.userInfo.uid, (file_name) => {
             res.end(file_name);
         });
