@@ -253,3 +253,37 @@ module.exports.bizcataloglist = function (req, res, err) {
     }
 
 };
+
+module.exports.bizQuery = function (req, res, err) {
+
+    try {
+        let rdata = req.query.rdata || req.params.rdata;
+        log.info('bizQuery()1:', rdata, typeof(rdata));
+
+        let cond = JSON.parse(rdata).cond;
+        log.info('bizQuery()2:', cond);
+
+
+        let MongoClient = require('mongodb').MongoClient;
+        MongoClient.connect(cf.dbUrl, function (err, db) {
+
+            let coll = db.collection('bizcatalog');
+
+            //流程：定位记录->用$slice操作符截取数组中的数据->取得结果集中的第一个元素->应答给前端
+            coll.find(cond)
+                .toArray(function (err, docs) {
+                    log.debug('bizQuery()3:', docs);
+
+                    if (docs.length === 0)
+                        res.send('no');
+                    else
+                        res.send(JSON.stringify(docs[0])); //将后端将数据以JSON字符串方式返回，前端以query.data获取数据。
+
+                    db.close();
+                });
+        });
+
+    } catch (err) {
+        log.error(err);
+    }
+};
