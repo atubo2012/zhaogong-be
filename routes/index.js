@@ -84,7 +84,7 @@ router.all('/biz-edit', bizMgmt.edit);//业务类别管理
 router.all('/biz-list', bizMgmt.list);//业务类别查询
 router.all('/bizcatalog-list', bizMgmt.bizcataloglist);//业务种类清单，客户查询清单时展示
 router.all('/biz-query', bizMgmt.bizQuery);//根据id查询某个业务大类
-
+router.all('/order-list', bizMgmt.orderlist);//查询动态配置商品相关的订单
 
 
 router.get('/uploadrm', function (req, res, next) {

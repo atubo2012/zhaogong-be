@@ -94,10 +94,9 @@ module.exports.edit = function (req, res, err) {
                                 }, function (err, r) {
                                     t.equal(null, err);
                                     log.debug('更新成功', r.result);
-
                                     //将当前的tomato成员，添加到bizcatalog表中，根据id字段upsert
                                     //bizcatalog专供客户查询时检索商品
-                                    _updateBizCatalog(p.tomato);
+                                    _updateBizCatalog(Object.assign(p.tomato, {supplier_id: p.openId}));
 
 
                                     db.close();
@@ -233,7 +232,7 @@ module.exports.bizcataloglist = function (req, res, err) {
 
             //流程：定位记录->用$slice操作符截取数组中的数据->取得结果集中的第一个元素->应答给前端
             coll.find(cond.query)
-                .sort({'updt': -1})
+                .sort(cond.sort)
                 .skip(cond.skip)
                 .limit(cond.limit)
                 .toArray(function (err, docs) {
@@ -286,4 +285,43 @@ module.exports.bizQuery = function (req, res, err) {
     } catch (err) {
         log.error(err);
     }
+};
+
+module.exports.orderlist = function (req, res, err) {
+
+    try {
+        let p = req.query || req.params;
+        log.info('查询条件cond1:');
+        log.debug(p, typeof(p), typeof(p.query));
+
+        let cond = JSON.parse(p.cond);
+        log.info('查询条件cond:2', cond);
+
+
+        let MongoClient = require('mongodb').MongoClient;
+        MongoClient.connect(cf.dbUrl, function (err, db) {
+
+            let coll = db.collection('rqst');
+
+            //流程：定位记录->用$slice操作符截取数组中的数据->取得结果集中的第一个元素->应答给前端
+            coll.find(cond.query)
+                .sort(cond.sort)
+                .skip(cond.skip)
+                .limit(cond.limit)
+                .toArray(function (err, docs) {
+                    log.debug(docs);
+
+                    if (docs.length === 0)
+                        res.send('no');
+                    else
+                        res.send(JSON.stringify(docs)); //将后端将数据以JSON字符串方式返回，前端以query.data获取数据。
+
+                    db.close();
+                });
+        });
+
+    } catch (err) {
+        log.error(err);
+    }
+
 };
