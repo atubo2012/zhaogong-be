@@ -24,7 +24,8 @@ module.exports.list = function (req, res, err) {
         let MongoClient = require('mongodb').MongoClient;
         MongoClient.connect(cf.dbUrlBb, function (err, db) {
 
-            let coll = db.collection('ljshesf_result');
+            //let coll = db.collection('ljshesf_result');
+            let coll = db.collection(cond.coll);
 
 
             coll.find(cond.query).sort(cond.sort).skip(cond.skip).limit(cond.limit).toArray(function (err, docs) {
