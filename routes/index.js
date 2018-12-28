@@ -16,6 +16,7 @@ let bizServMsg = require('../biz/bizServMsg.js');
 let bizTomato = require('../biz/bizTomato.js');
 let bizBamboo = require('../biz/bizBamboo.js');
 let bizMgmt = require('../biz/bizMgmt.js');
+let bizThirdSvs = require('../biz/bizThirdSvs.js');
 
 
 /* GET home page. 验证express框架是否就绪的web页面*/
@@ -80,11 +81,12 @@ router.all('/msgpush', bizServMsg.msgpush);//客服信息推送。由微信服�
 
 router.all('/stat-push', bizServMsg.statpush);//客服信息推送。由微信服务器收到客户消息后会发送到本接口
 
-router.all('/biz-edit', bizMgmt.edit);//业务类别管理
-router.all('/biz-list', bizMgmt.list);//业务类别查询
+router.all('/biz-edit', bizMgmt.edit);              //业务类别管理
+router.all('/biz-list', bizMgmt.list);              //业务类别查询
 router.all('/bizcatalog-list', bizMgmt.bizcataloglist);//业务种类清单，客户查询清单时展示
-router.all('/biz-query', bizMgmt.bizQuery);//根据id查询某个业务大类
-router.all('/order-list', bizMgmt.orderlist);//查询动态配置商品相关的订单
+router.all('/biz-query', bizMgmt.bizQuery);         //根据id查询某个业务大类
+router.all('/order-list', bizMgmt.orderlist);       //查询动态配置商品相关的订单
+router.all('/city-list', bizThirdSvs.cityList);    //rsr城市列表查询
 
 
 router.get('/uploadrm', function (req, res, next) {

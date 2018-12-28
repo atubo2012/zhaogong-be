@@ -6,7 +6,7 @@ let log = ut.logger(__filename);
 
 
 /**
- * 参考univ-list的翻页查询算法
+ * 根据前端传入的cond对象中coll、query、sort、skip、limit，返回结果集
  * @param req
  * @param res
  * @param err
@@ -24,12 +24,10 @@ module.exports.list = function (req, res, err) {
         let MongoClient = require('mongodb').MongoClient;
         MongoClient.connect(cf.dbUrlBb, function (err, db) {
 
-            //let coll = db.collection('ljshesf_result');
             let coll = db.collection(cond.coll);
 
 
             coll.find(cond.query).sort(cond.sort).skip(cond.skip).limit(cond.limit).toArray(function (err, docs) {
-                //log.debug(docs);
 
                 if (docs && docs.length === 0)
                     res.send('no');

@@ -171,6 +171,42 @@ module.exports = {
             return ret;
 
         }
+    },
+    cities: {//城市相关的参数，cities的配置内容应与采数模块中的config一致
+        'sh': {
+            exclude: [    //不予采集的板块
+                //'浦东','闵行','宝山','徐汇' ,'普陀', '杨浦','长宁','黄浦','静安','闸北','虹口',
+                '松江', '嘉定', '青浦', '奉贤', '金山', '崇明', '上海周边']
+        },
+        'hz': {exclude: [],},//杭州
+        'su': {exclude: [],},
+        'nj': {exclude: [],},//南京
+        'hf': {exclude: [],},//合肥
+
+        'bj': {exclude: ['昌平', '大兴'],},
+        'tj': {exclude: [],},//天津
+
+        'sz': {exclude: [],},//深圳
+        'gz': {exclude: [],},//广州
+        'dg': {exclude: [],},//东莞
+        'xm': {exclude: [],},//厦门
+
+        'cd': {
+            exclude: [
+                '江津', '大渡口', '渝中'
+            ],
+        },
+        'cq': {exclude: ['八宝街'],},
+
+        'wh': {exclude: [],},
+        'cs': {exclude: [],},//长沙
+        'zz': {exclude: [],},//郑州
+        'jn': {exclude: [],},//济南
+        'qd': {exclude: [],},//青岛
+
+        'dl': {exclude: [],},//大连
+        'sy': {exclude: [],},//沈阳
+
     }
 
 };
