@@ -88,7 +88,6 @@ router.all('/biz-query', bizMgmt.bizQuery);         //根据id查询某个业务
 router.all('/order-list', bizMgmt.orderlist);       //查询动态配置商品相关的订单
 router.all('/city-list', bizThirdSvs.cityList);    //rsr城市列表查询
 
-
 router.get('/uploadrm', function (req, res, next) {
 
     let rmfile = JSON.parse(req.query.rdata).rmfile;
