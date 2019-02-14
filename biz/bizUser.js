@@ -130,7 +130,7 @@ module.exports.edit = function (req, res, err) {
 
     //更新用户信息前，检查是否uid字段存在，若不存在，则补充生成。
     if (!p.uid || '' === p.uid) {
-        p['uid'] = ut.getId('U');
+        p['uid'] = ut.getId32('U');
         log.debug('uid尚未生成，生成新的uid为：' + p['uid']);
     }
     try {
@@ -481,7 +481,7 @@ module.exports.chck = function (req, res, err) {
                     MongoClient.connect(cf.dbUrl, function (err, db) {
                         let coll = db.collection('user');
                         let t = require('assert');
-                        let uid = ut.getId('U');//生成uid
+                        let uid = ut.getId32('U');//生成uid
 
                         //生成营销二维码
                         ut.genQrCode({
