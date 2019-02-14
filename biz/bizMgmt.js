@@ -21,7 +21,7 @@ module.exports.edit = function (req, res, err) {
 
     //如果请求中没有id，则说明是新增请求，则生成reqId
     if (!p.tomato.id) {
-        p.tomato.id = ut.getId32('');
+        p.tomato.id = ut.getId32('BT_');
         isNew = true;//表示是新增记录
     }
 
